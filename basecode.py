@@ -374,6 +374,9 @@ class Tilemap:
 
         self.last_collision_rects = []
 
+
+        # Demo Git-Kommentar
+
         # Tilesets einlesen
         for ts in tilemap_json["tilesets"]:
             if ts:
