@@ -13,41 +13,44 @@ import os
 import json
 
 import ctypes
+
 ctypes.windll.user32.SetProcessDPIAware()
 pygame.init()
 
-
 # Globals
-screen = pygame.display.set_mode((480, 256),pygame.SCALED|pygame.RESIZABLE, vsync=1)
+screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
 
 logging.getLogger().setLevel("INFO")
 
-
 ## PIPRINT
 font = Font("mago3.ttf", 16, bold=False, italic=False)
-pico_colors=["black", "darkblue", "darkred", "darkgreen",
-             "brown", "darkgrey", "lightgrey", "white",
-             "red", "orange", "yellow", "green",
-             "blue", "grey", "pink", "lightpink"]
+pico_colors = ["black", "darkblue", "darkred", "darkgreen",
+               "brown", "darkgrey", "lightgrey", "white",
+               "red", "orange", "yellow", "green",
+               "blue", "grey", "pink", "lightpink"]
 last_color = 7
 
-print_map ={}
+print_map = {}
+
 
 def piprint(text, x, y, color="white"):
     if (text, color) in print_map.keys():
-        screen.blit(print_map[(text, color)], (x,y))
+        screen.blit(print_map[(text, color)], (x, y))
     else:
         s = font.render(text, False, color)
         print_map[(text, color)] = s
-        screen.blit(s, (x,y))
+        screen.blit(s, (x, y))
+
 
 ## circ
 
 def circ(x, y, r, color=7, surface=screen):
     pygame.draw.circle(surface, pico_colors[color % 16], (x, y), r, width=1)
 
+
 def circfill(x, y, r, color=7, surface=screen):
-    pygame.draw.circle(surface,  pico_colors[color % 16], (x, y), r, width=0)
+    pygame.draw.circle(surface, pico_colors[color % 16], (x, y), r, width=0)
+
 
 class Controller:
     def __init__(self):
@@ -90,6 +93,7 @@ class Controller:
         else:
             self.right = 0
 
+
 class Actor:
     def __init__(self):
         self.dirty = False
@@ -103,6 +107,7 @@ class Actor:
     def destroy(self):
         self.dirty = True
 
+
 class Camera(Actor):
     def __init__(self):
         super().__init__()
@@ -110,7 +115,7 @@ class Camera(Actor):
         self.y = 0
         self.w = 480
         self.h = 256
-        self.r = pygame.Rect(0,0,480,256)
+        self.r = pygame.Rect(0, 0, 480, 256)
 
     def follow(self, fobj):
         self.follow_obj = fobj
@@ -118,13 +123,15 @@ class Camera(Actor):
     def tick(self):
         if self.follow_obj:
             self.x = self.follow_obj.r.centerx - 240
-            #self.y = self.follow_obj.r.centery - 128
+            self.y = self.follow_obj.r.centery - 128
+
 
 # Globals ################
 
 
 class TestScene2(Actor):
     """ Test-Scene mit Schneeflocken"""
+
     def __init__(self):
         super().__init__()
         self.stars = []
@@ -137,13 +144,14 @@ class TestScene2(Actor):
             if s[1] > 270:
                 s = (s[0], 0)
             else:
-                s = (s[0], s[1]+s[0] % 16/26+0.2) # unterschiedl. Geschw.
+                s = (s[0], s[1] + s[0] % 16 / 26 + 0.2)  # unterschiedl. Geschw.
             self.stars[i] = s
 
     def draw(self):
-        #piprint(surface, "TestScene2", (380+self.x, 10), "green")
+        # piprint(surface, "TestScene2", (380+self.x, 10), "green")
         for i in range(len(self.stars)):
-            pygame.draw.circle(screen,"white", self.stars[i], 2, 2)
+            pygame.draw.circle(screen, "white", self.stars[i], 2, 2)
+
 
 class Menu(Actor):
     def __init__(self):
@@ -157,16 +165,16 @@ class Menu(Actor):
         if controller.a == 1:
             self.clicked(self.items[self.pos])
 
-        #Up
+        # Up
         if controller.down == 1:
             self.pos += 1
         if self.pos >= len(self.items):
             self.pos = 0
-        #Down
-        if controller.up  == 1:
+        # Down
+        if controller.up == 1:
             self.pos -= 1
         if self.pos == -1:
-            self.pos = len(self.items)-1
+            self.pos = len(self.items) - 1
 
     def draw(self, sf):
         x = 40
@@ -182,8 +190,10 @@ class Menu(Actor):
                 piprint(item, x + 10, y, "red")
             y += yd
             num += 1
+
     def clicked(self, item):
         pass
+
 
 class MainMenu(Menu):
     def __init__(self):
@@ -194,25 +204,28 @@ class MainMenu(Menu):
         if item == "EXIT":
             sys.exit()
 
+
 class OptionsMenu(Menu):
     def __init__(self):
         super().__init__()
         self.items = ["SCENE 1", "SCENE 2", "TOGGLE FULLSCREEN", "EXIT"]
+
     def clicked(self, item):
         if item == "TOGGLE FULLSCREEN":
             pygame.display.toggle_fullscreen()
         if item == "EXIT":
             sys.exit()
 
+
 ##################################################################
 # Tiles
 ##################################################################
 
 class Tile:
-    WALL        = 1
-    STAIR       = 2
-    DANGER      = 4
-    ALL_FLAGS   = 255
+    WALL = 1
+    STAIR = 2
+    DANGER = 4
+    ALL_FLAGS = 255
 
     def __init__(self, surface, tile_id, flags):
         self.surface = surface
@@ -225,7 +238,7 @@ class Tile:
         self.flags |= self.STAIR if "stair" in flags.lower() else 0
         self.flags |= self.DANGER if "stair" in flags.lower() else 0
 
-    def has_flags(self,flags):
+    def has_flags(self, flags):
         return self.flags & flags
 
     def tick(self):
@@ -239,8 +252,9 @@ class Tile:
             return
         else:
             self.anim_counter += 1
-            self.anim_counter=self.anim_counter % len(self.anim_surfaces)
+            self.anim_counter = self.anim_counter % len(self.anim_surfaces)
             self.surface = self.anim_surfaces[self.anim_counter]
+
 
 class Tileset:
     def __init__(self):
@@ -258,12 +272,16 @@ class Tileset:
             'firstgid' wird bei mehreren Tilesets in einer Map enthalten sind.
         """
         tileset_json = json.load(open(path))
+
+        # Handelt es sich um ein Tileset mit Sprites statt Tiles?
+        if not "image" in tileset_json.keys():
+            return # wird nicht eingelesen
         logging.info(f'Lade Tileset "{path}"')
         self.columns = tileset_json["columns"]
-        self.rows    = math.floor(tileset_json["tilecount"]/self.columns)
+        self.rows = math.floor(tileset_json["tilecount"] / self.columns)
         self.tilecount = tileset_json["tilecount"]
         self.tileheight = tileset_json["tileheight"]
-        self.tilewidth  = tileset_json["tilewidth"]
+        self.tilewidth = tileset_json["tilewidth"]
         try:
             fname = os.path.join(os.path.dirname(path), tileset_json["image"])
             self.img = pygame.image.load(fname)
@@ -281,7 +299,7 @@ class Tileset:
         for row in range(self.rows):
             for col in range(self.columns):
                 tile_id = row * self.columns + col
-                rect = pygame.Rect(self.tilewidth*col, self.tileheight*row, 16, 16)
+                rect = pygame.Rect(self.tilewidth * col, self.tileheight * row, 16, 16)
                 sf = pygame.Surface((self.tilewidth, self.tileheight), pygame.SRCALPHA)
                 sf.blit(self.img, (0, 0), rect)
 
@@ -313,18 +331,18 @@ class Tileset:
             if js_tile and "type" in js_tile.keys():
                 flags = js_tile["type"].lower()
             frame_ids = []
-            #print(js_tile.keys())
+            # print(js_tile.keys())
             for frame in js_tile["animation"]:
                 duration = frame["duration"]
                 frame_id = frame["tileid"]
                 frame_ids.append(frame_id)
 
             # Erste Surface
-            sf = self.get(frame_ids[0]+first_gid).surface
+            sf = self.get(frame_ids[0] + first_gid).surface
             # Anim-Tile erstellen mit erstem Frame
             t = Tile(sf, tile_id + first_gid, flags)
             # Surface-Liste der Animation-Frames erstellen
-            t.anim_surfaces = [self.get(i+first_gid).surface for i in frame_ids]
+            t.anim_surfaces = [self.get(i + first_gid).surface for i in frame_ids]
             self.tiles.append(t)
             self.idmap[tile_id + first_gid] = t
             # Tiles in ids_anim erhalten ticks
@@ -347,7 +365,7 @@ class Tileset:
 class Tilemap:
     def __init__(self):
         self.tileheight = 0
-        self.tilewidth  = 0
+        self.tilewidth = 0
         self.width = 0
         self.height = 0
         self.backgroundcolor = pygame.Color("black")
@@ -356,13 +374,13 @@ class Tilemap:
 
         self.last_collision_rects = []
 
-    def load(self, filepath:str) -> None:
+    def load(self, filepath: str) -> None:
         """Lädt eine Tilemap im json-Format (Tiled)"""
         dirname = os.path.dirname(filepath)
         tilemap_json = json.load(open(filepath))
 
         self.tileheight = tilemap_json["tileheight"]
-        self.tilewidth  = tilemap_json["tilewidth"]
+        self.tilewidth = tilemap_json["tilewidth"]
         self.width = tilemap_json["width"]
         self.height = tilemap_json["height"]
 
@@ -373,7 +391,6 @@ class Tilemap:
         self.tilesets = []
 
         self.last_collision_rects = []
-
 
         # Demo Git-Kommentar
 
@@ -401,8 +418,8 @@ class Tilemap:
                 for y in range(self.height):
                     row = []
                     for x in range(self.width):
-                        row.append(self.get_tile_from_id(map_temp[x+(self.width*y)]))
-                        #self.mapdata.append(map_temp[self.width * y:self.width * y + self.width])
+                        row.append(self.get_tile_from_id(map_temp[x + (self.width * y)]))
+                        # self.mapdata.append(map_temp[self.width * y:self.width * y + self.width])
                     self.mapdata.append(row)
 
                 logging.info(f"Tilemap-Layer '{name}' of size {self.width}*{self.height} imported..")
@@ -439,15 +456,15 @@ class Tilemap:
         topleft = self.get(rect.topleft[0], rect.topleft[1])
         bottomright = self.get(rect.x + rect.w - 1, rect.y + rect.h - 1)
 
-        for y in range(topleft[1], bottomright[1]+1):
-            for x in range(topleft[0], bottomright[0]+1):
+        for y in range(topleft[1], bottomright[1] + 1):
+            for x in range(topleft[0], bottomright[0] + 1):
                 tile = self.mapdata[y][x]
                 if tile and tile.has_flags(flags):  # not empty Room
                     collision_tiles.append(self.__get_tile_rect(x, y))
         self.last_collision_rects = collision_tiles
         return collision_tiles
 
-    def get_tile_from_id(self, tid:int):
+    def get_tile_from_id(self, tid: int):
         if tid == 0:
             return None
         for ts in self.tilesets:
@@ -455,40 +472,87 @@ class Tilemap:
                 return tile
         logging.error(f"TileId {tid} from map not found..")
         sys.exit()
+
     def tick(self):
         for _ in self.tilesets:
             _.tick()
 
     def draw(self):
-        first_tile_x = math.floor(camera.x/self.tilewidth)
-        first_tile_y = math.floor(camera.y/self.tileheight)
-        tiles2draw_hor  = math.floor((camera.w / self.tilewidth)) + 2
+        first_tile_x = math.floor(camera.x / self.tilewidth)
+        first_tile_y = math.floor(camera.y / self.tileheight)
+        tiles2draw_hor = math.floor((camera.w / self.tilewidth)) + 2
         tiles2draw_vert = math.floor((camera.h / self.tilewidth)) + 2
 
         offset_x = abs(math.fmod(camera.x, self.tilewidth))
         if camera.x < 0 and offset_x > 0:
-            offset_x = self.tilewidth-offset_x
+            offset_x = self.tilewidth - offset_x
 
         offset_y: float = abs(math.fmod(camera.y, self.tileheight))
         if camera.y < 0 and offset_y > 0:
-            offset_y = self.tileheight-offset_y
+            offset_y = self.tileheight - offset_y
 
         for step_y in range(tiles2draw_vert):
             for step_x in range(tiles2draw_hor):
                 tile_x = first_tile_x + step_x
                 tile_y = first_tile_y + step_y
-                draw_pos_x = (step_x*self.tilewidth) - offset_x
+                draw_pos_x = (step_x * self.tilewidth) - offset_x
                 draw_pos_y = (step_y * self.tileheight) - offset_y
-                if tile_y < 0 or tile_y > (self.height-1) or tile_x < 0 or tile_x > (self.width-1):
+                if tile_y < 0 or tile_y > (self.height - 1) or tile_x < 0 or tile_x > (self.width - 1):
                     # Grünes Gitter außerhalb der Map zeichnen (Debug)
                     if debug:
-                        pygame.draw.rect(screen, pygame.Color("green"), (int(draw_pos_x),int(draw_pos_y), self.tilewidth, self.tileheight),1)
+                        pygame.draw.rect(screen, pygame.Color("green"),
+                                         (int(draw_pos_x), int(draw_pos_y), self.tilewidth, self.tileheight), 1)
                 else:
                     if tile := self.mapdata[tile_y][tile_x]:
                         screen.blit(tile.surface, (int(draw_pos_x), int(draw_pos_y)))
                 if debug:
-                     pygame.draw.line(screen, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
+                    pygame.draw.line(screen, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
 
+
+class Animation:
+    def __init__(self, imgpath, width, tpi, xflip=False, repeat=True):
+        if imgpath == "":
+            return
+        img = pygame.image.load(imgpath)
+        img_count = int(math.floor(img.get_width() / width))
+        self.images = []
+        self.tpi = tpi # ticks per image
+        self.repeat = repeat
+        self.actual_tpi = tpi
+        self.actual_index = 0
+        self.width = width
+        self.height = img.get_height()
+        self.end = False
+        for i in range(img_count):
+            anim_img = pygame.Surface((width,img.get_height()),pygame.SRCALPHA)
+            anim_img.blit(img, (0,0), pygame.Rect(i*width,0,width,img.get_height()))
+            if xflip:
+                anim_img = pygame.transform.flip(anim_img, True, False)
+            self.images.append(anim_img)
+
+    def reset(self):
+        self.end = False
+        self.actual_index = 0
+
+    def tick(self):
+        if self.end:
+            return
+        self.actual_tpi -= 1
+        if self.actual_tpi <= 0:
+            self.actual_tpi = self.tpi
+            self.actual_index += 1
+            if self.actual_index >= len(self.images):
+                if self.repeat:
+                    self.actual_index = 0
+                else:
+                    self.end = True
+
+    def draw(self, surface, pos):
+        if self.end:
+            return
+        if self.scene.debug:
+            pygame.draw.rect(surface, "blue", pygame.Rect(pos[0],pos[1],self.width,self.height),1)
+        surface.blit(self.images[self.actual_index], pos)
 
 ######################################################################
 # Für Player-Sprites, Gegner, bewegliche Objekte
@@ -511,7 +575,7 @@ class TilemapActor(Actor):
                 blocked = True
                 self.xs = 0.0
         if yd:
-            if not self.move2(0,yd):
+            if not self.move2(0, yd):
                 blocked = True
                 self.ys = 0.0
         return not blocked
@@ -542,26 +606,26 @@ class TilemapActor(Actor):
                     if tr.top < wall_tile.bottom:
                         tr.top = wall_tile.bottom
             if yd > 0:
-                # Fußstück für Kollision berechnen
-                tr_stair = pygame.Rect(tr.x, tr.y+tr.h-4, tr.w, 4)
-                for stair_tile in self.tmap.get_tiles(tr_stair, Tile.STAIR):
-                    stair_tile.h = 4
-                    if tr_stair.colliderect(stair_tile):
+                for stair_tile in self.tmap.get_tiles(tr, Tile.STAIR):
+                    # wenn mit treppe kollidiert und im letzten Frame vollständig oberhalb des Tiles war
+                    if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
+
         self.r = tr
         return not blocked
 
     def on_floor(self):
         """ detects ground """
-        tr = pygame.Rect(self.r.x, self.r.y+self.r.h, self.r.w, 1)
+        tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         for tile_rect in self.tmap.get_tiles(tr, Tile.WALL):
             tile_rect.h = 1
             if tr.colliderect(tile_rect):
                 return True
         return False
+
     def on_stair(self):
         """ detects ground """
-        tr = pygame.Rect(self.r.x, self.r.y+self.r.h, self.r.w, 1)
+        tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         for tile_rect in self.tmap.get_tiles(tr, Tile.STAIR):
             tile_rect.h = 1
             if tr.colliderect(tile_rect):
@@ -578,40 +642,43 @@ class TilemapActor(Actor):
     def draw(self):
         pass
 
+
 class Player(TilemapActor):
     def __init__(self, tmap, x, y):
         super().__init__(x, y, 16, 32, tmap)
 
     def tick(self):
-        on_floor = self.on_floor()
-        on_stair = self.on_stair()
+        on_floor = self.on_floor()  # wird mehrmals benötigt
+        on_stair = self.on_stair()  # wird mehrmals benötigt
+
         if controller.left:
             self.xs = -2
         elif controller.right:
             self.xs = 2
         else:
             self.xs = 0
-        # Von Treppe nach unten fallen?
-        if controller.a==1 and not controller.down:
-            # Berührt Boden?
-            if on_stair or on_floor:
-                self.ys=-7.0
-        elif on_stair or on_floor:
-                self.ys=0.0
-        # Vom Boden Springen?
-        if controller.a==1 and controller.down and on_stair:
-            self.r.y += 8
+        # Springen
+        if controller.a == 1 and not controller.down and (on_stair or on_floor):
+            self.ys = -6.3
+
+        # Von Treppe fallen lassen
+        if controller.a == 1 and controller.down and on_stair:
+            self.r.y += 1
+
+        if controller.a == 0 and (on_stair or on_floor):
+            self.ys = 0.0
         super().tick()
 
     def draw(self):
-        pygame.draw.rect(screen, "white", self.r.move(-camera.x,-camera.y), 1, 7)
-        piprint(f"x={self.r.x}  y={self.r.y}",4,4)
+        pygame.draw.rect(screen, "white", self.r.move(-camera.x, -camera.y), 1, 7)
+
 
 db_rects = []
 
+
 def draw_debug():
     for r in db_rects:
-        pygame.draw.rect(screen, "red", r.move(-camera.x,-camera.y), 1)
+        pygame.draw.rect(screen, "red", r.move(-camera.x, -camera.y), 1)
     db_rects.clear()
 
 

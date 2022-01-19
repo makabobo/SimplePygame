@@ -39,5 +39,6 @@ while 1:
     if debug:
         draw_debug()
 
+    piprint(f"FPS {clock.get_fps():>3.1f}", 420,3, "darkred")
     clock.tick_busy_loop(60)
     pygame.display.flip()
