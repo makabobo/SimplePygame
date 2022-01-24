@@ -14,7 +14,10 @@ map.load("./img/test_map.json")
 
 
 pl = Player(map, 32,208)
+mp = MovingPlatform()
+platforms.append(mp)
 scenes.append(map)
+scenes.append(mp)
 camera.follow(pl)
 
 debug = True

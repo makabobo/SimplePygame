@@ -111,6 +111,7 @@ class Actor:
 class Camera(Actor):
     def __init__(self):
         super().__init__()
+        self.follow_obj = None
         self.x = 0
         self.y = 0
         self.w = 480
@@ -176,7 +177,7 @@ class Menu(Actor):
         if self.pos == -1:
             self.pos = len(self.items) - 1
 
-    def draw(self, sf):
+    def draw(self):
         x = 40
         y = 40
         yd = 15
@@ -275,7 +276,7 @@ class Tileset:
 
         # Handelt es sich um ein Tileset mit Sprites statt Tiles?
         if not "image" in tileset_json.keys():
-            return # wird nicht eingelesen
+            return  # wird nicht eingelesen
         logging.info(f'Lade Tileset "{path}"')
         self.columns = tileset_json["columns"]
         self.rows = math.floor(tileset_json["tilecount"] / self.columns)
@@ -516,19 +517,20 @@ class Animation:
         img = pygame.image.load(imgpath)
         img_count = int(math.floor(img.get_width() / width))
         self.images = []
-        self.tpi = tpi # ticks per image
         self.repeat = repeat
-        self.actual_tpi = tpi
         self.actual_index = 0
         self.width = width
         self.height = img.get_height()
         self.end = False
         for i in range(img_count):
-            anim_img = pygame.Surface((width,img.get_height()),pygame.SRCALPHA)
-            anim_img.blit(img, (0,0), pygame.Rect(i*width,0,width,img.get_height()))
+            anim_img = pygame.Surface((width, img.get_height()), pygame.SRCALPHA)
+            anim_img.blit(img, (0, 0), pygame.Rect(i * width, 0, width, img.get_height()))
             if xflip:
                 anim_img = pygame.transform.flip(anim_img, True, False)
             self.images.append(anim_img)
+
+    def load(self, imgpath, width, tpi, xflip=False, repeat=True):
+        pass
 
     def reset(self):
         self.end = False
@@ -537,25 +539,25 @@ class Animation:
     def tick(self):
         if self.end:
             return
-        self.actual_tpi -= 1
-        if self.actual_tpi <= 0:
-            self.actual_tpi = self.tpi
-            self.actual_index += 1
-            if self.actual_index >= len(self.images):
-                if self.repeat:
-                    self.actual_index = 0
-                else:
-                    self.end = True
 
     def draw(self, surface, pos):
-        if self.end:
-            return
-        if self.scene.debug:
-            pygame.draw.rect(surface, "blue", pygame.Rect(pos[0],pos[1],self.width,self.height),1)
-        surface.blit(self.images[self.actual_index], pos)
+        surface.blit(self.images[0], pos)
+
 
 ######################################################################
 # Für Player-Sprites, Gegner, bewegliche Objekte
+
+class MovingPlatform(Actor):
+    def __init__(self):
+        super().__init__()
+        self.r = pygame.Rect(200,200,48,4)
+
+    def tick(self):
+        pass
+
+    def draw(self):
+        pygame.draw.rect(screen, "red", self.r.move(-camera.x, -camera.y), 1)
+
 
 
 class TilemapActor(Actor):
@@ -586,7 +588,14 @@ class TilemapActor(Actor):
         tr = self.r.move(xd, yd)  # tr=target_rect
         blocked = False
         if xd != 0 or yd != 0:
-            for wall_tile in self.tmap.get_tiles(tr, Tile.WALL):
+
+            col_rects = self.tmap.get_tiles(tr, Tile.WALL)
+            pl = platforms[0]
+            if tr.colliderect(pl.r):
+                col_rects.append(pl.r)
+
+
+            for wall_tile in col_rects:
 
                 blocked = True
                 # Kollision rechts?
@@ -686,6 +695,7 @@ controller = Controller()
 camera = Camera()
 menu = None
 debug = False
+platforms = []
 # main_scene
 # tilemap
 # sprite_groups
