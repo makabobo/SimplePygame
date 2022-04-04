@@ -7,18 +7,24 @@ from basecode import *
 clock = pygame.time.Clock()
 
 
-scenes = []
-
 map = Tilemap()
 map.load("./img/test_map.json")
 
 
-pl = Player(map, 32,208)
-mp = MovingPlatform()
-platforms.append(mp)
-scenes.append(map)
-scenes.append(mp)
-camera.follow(pl)
+player = Player(map, 300, 190)
+physics_elements.append(player)
+
+moving_platforms.append(MovingPlatform(190, 260, 64, 8, 190, 320))
+moving_blocks.append(MovingBlock(130, 270, 30, 30, 130, 200))
+
+
+
+moving_platforms.append(MovingPlatform(480, 260, 64, 8, 480, 650))
+moving_blocks.append(MovingBlock(650, 240, 64, 8, 480, 600))
+
+
+
+camera.follow(player)
 
 debug = True
 
@@ -26,21 +32,25 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key==pygame.K_q):
             sys.exit()
-    #Tick
+    # Tick ###########
     controller.tick()
-    for scene in scenes:
-        scene.tick()
-    pl.tick()
+    map.tick()
+    for mp in moving_platforms+moving_blocks:
+        mp.tick()
+    player.tick()
     camera.tick()
 
-    # Draw
+    # Draw ###########
     screen.fill(map.backgroundcolor)
-    for scene in scenes:
+    map.draw()
+    for scene in moving_platforms+moving_blocks:
         scene.draw()
-    pl.draw()
+    player.draw()
 
     if debug:
         draw_debug()
+
+    piprint("Hello", 10, 240)
 
     piprint(f"FPS {clock.get_fps():>3.1f}", 420,3, "darkred")
     clock.tick_busy_loop(60)

@@ -19,7 +19,7 @@ pygame.init()
 
 # Globals
 screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
-
+#screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
 logging.getLogger().setLevel("INFO")
 
 ## PIPRINT
@@ -116,6 +116,7 @@ class Camera(Actor):
         self.y = 0
         self.w = 480
         self.h = 256
+        self.border_width = 100
         self.r = pygame.Rect(0, 0, 480, 256)
 
     def follow(self, fobj):
@@ -123,8 +124,18 @@ class Camera(Actor):
 
     def tick(self):
         if self.follow_obj:
-            self.x = self.follow_obj.r.centerx - 240
-            self.y = self.follow_obj.r.centery - 128
+            if self.follow_obj.r.centerx - self.x < self.border_width:
+                self.x = self.follow_obj.r.centerx - self.border_width
+            if self.x+self.w - self.follow_obj.r.centerx < self.border_width:
+                self.x = self.follow_obj.r.centerx +self.border_width-self.w
+
+            if self.follow_obj.r.centery - self.y < self.border_width:
+                self.y = self.follow_obj.r.centery - self.border_width
+            if self.y+self.h - self.follow_obj.r.centery < self.border_width:
+                self.y = self.follow_obj.r.centery +self.border_width-self.h
+
+
+            # self.y = self.follow_obj.r.centery-128
 
 
 # Globals ################
@@ -450,7 +461,7 @@ class Tilemap:
     def __get_tile_rect(self, celx, cely):
         return pygame.rect.Rect(celx * self.tilewidth, cely * self.tileheight, self.tilewidth, self.tileheight)
 
-    def get_tiles(self, rect, flags=Tile.ALL_FLAGS) -> List[pygame.Rect]:
+    def get_collision_tiles(self, rect, flags=Tile.ALL_FLAGS) -> List[pygame.Rect]:
         """"Liefert zu einem Rechteck eine Liste aller kollidierenden Rects zurück mit gegebenen Flags"""
 
         collision_tiles = []
@@ -544,30 +555,91 @@ class Animation:
         surface.blit(self.images[0], pos)
 
 
-######################################################################
-# Für Player-Sprites, Gegner, bewegliche Objekte
-
-class MovingPlatform(Actor):
-    def __init__(self):
+class MovingBlock(Actor):
+    def __init__(self, x, y, w, h, xstart,xend):
         super().__init__()
-        self.r = pygame.Rect(200,200,48,4)
+        self.start_rect = pygame.Rect(x,y,w,h)
+        self.r = self.start_rect.copy()
+        self.direction = "RIGHT"
+        self.x_start = xstart
+        self.x_end = xend
 
     def tick(self):
-        pass
+        if self.direction == "RIGHT":
+            tr = self.r.move(1, 0)
+            if tr.x >= self.x_end:
+                self.direction = "LEFT"
+            for pe in physics_elements:
+                # Kollidierende Objekte verschieben
+                if pe.r.colliderect(tr):
+                    if not pe.move2(1, 0):
+                        print("DEAD"+str(tr.x))
+                # Darauf stehende Objekte verschieben
+                if not pe.r.colliderect(tr) and pe.r.move(0, 1).colliderect(tr):
+                    pe.move2(1, 0)
+            self.r = tr
+        else:
+            tr = self.r.move(-1, 0)
+            if tr.x <= self.x_start:
+                self.direction = "RIGHT"
+            for pe in physics_elements:
+                # Kollidierende Objekte verschieben
+                if pe.r.colliderect(tr):
+                    if not pe.move2(-1, 0):
+                        print("DEAD"+str(tr.x))
+                # Darauf stehende Objekte verschieben
+                if not pe.r.colliderect(tr) and pe.r.move(0, -1).colliderect(tr):
+                    pe.move2(-1, 0)
+            self.r = tr
 
     def draw(self):
-        pygame.draw.rect(screen, "red", self.r.move(-camera.x, -camera.y), 1)
+        pygame.draw.rect(screen, "red", self.r.move(-camera.x,-camera.y), 1)
+        #screen.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
+
+class MovingPlatform(Actor):
+    def __init__(self, x, y, w, h, xstart,xend):
+        super().__init__()
+        self.img = pygame.image.load("img/moving_platform.png")
+        self.start_rect = pygame.Rect(x,y,w,h)
+        self.r = self.start_rect.copy()
+        self.direction = "RIGHT"
+        self.x_start = xstart
+        self.x_end = xend
+
+    def tick(self):
+        if self.direction == "RIGHT":
+            self.r.x += 1
+            if self.r.x >= self.x_end:
+                self.direction = "LEFT"
+            for pe in physics_elements:
+                if not pe.r.colliderect(self.r) and pe.r.move(0, 1).colliderect(self.r):
+                #if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
+                    #pe.r.move_ip(1, 0)
+                    pe.move2(1, 0)
+        else:
+            self.r.x -= 1
+            if self.r.x <= self.x_start:
+                self.direction = "RIGHT"
+            for pe in physics_elements:
+                if not pe.r.colliderect(self.r) and pe.r.move(0, 1).colliderect(self.r):
+                #if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
+                    #pe.r.move_ip(-1, 0)
+                    pe.move2(-1,0)
 
 
+    def draw(self):
+        screen.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
 
+######################################################################
+# Für Player-Sprites, Gegner, bewegliche Objekte
 class TilemapActor(Actor):
     def __init__(self, x, y, w, h, tmap):
         super().__init__()
         self.r = pygame.Rect(x, y, w, h)
         self.tmap = tmap
-        self.xa = 0.0
-        self.ya = 0.4  # Erdbeschleunigung
-        self.xs = 0.0
+        self.xa = 0.0  # Acceleration
+        self.ya = 0.4
+        self.xs = 0.0  # speed
         self.ys = 0.0
 
     def move(self, xd, yd, ignore_stairs=False):
@@ -589,13 +661,10 @@ class TilemapActor(Actor):
         blocked = False
         if xd != 0 or yd != 0:
 
-            col_rects = self.tmap.get_tiles(tr, Tile.WALL)
-            pl = platforms[0]
-            if tr.colliderect(pl.r):
-                col_rects.append(pl.r)
+            collision_rects = self.tmap.get_collision_tiles(tr, Tile.WALL)
+            collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
-
-            for wall_tile in col_rects:
+            for wall_tile in collision_rects:
 
                 blocked = True
                 # Kollision rechts?
@@ -615,7 +684,7 @@ class TilemapActor(Actor):
                     if tr.top < wall_tile.bottom:
                         tr.top = wall_tile.bottom
             if yd > 0:
-                for stair_tile in self.tmap.get_tiles(tr, Tile.STAIR):
+                for stair_tile in self.tmap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
                     # wenn mit treppe kollidiert und im letzten Frame vollständig oberhalb des Tiles war
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
@@ -626,7 +695,9 @@ class TilemapActor(Actor):
     def on_floor(self):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        for tile_rect in self.tmap.get_tiles(tr, Tile.WALL):
+        collision_rects = self.tmap.get_collision_tiles(tr, Tile.WALL)
+        collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        for tile_rect in collision_rects:
             tile_rect.h = 1
             if tr.colliderect(tile_rect):
                 return True
@@ -635,7 +706,9 @@ class TilemapActor(Actor):
     def on_stair(self):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        for tile_rect in self.tmap.get_tiles(tr, Tile.STAIR):
+        collision_rects = self.tmap.get_collision_tiles(tr, Tile.STAIR)
+        collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        for tile_rect in collision_rects:
             tile_rect.h = 1
             if tr.colliderect(tile_rect):
                 return True
@@ -646,7 +719,8 @@ class TilemapActor(Actor):
             self.ys += self.ya
         if self.ys > 7.0:
             self.ys = 7.0
-        self.move(int(self.xs), int(self.ys))
+
+        self.move(self.xs, self.ys)
 
     def draw(self):
         pass
@@ -668,13 +742,13 @@ class Player(TilemapActor):
             self.xs = 0
         # Springen
         if controller.a == 1 and not controller.down and (on_stair or on_floor):
-            self.ys = -6.3
+            self.ys = -6.7
 
         # Von Treppe fallen lassen
         if controller.a == 1 and controller.down and on_stair:
             self.r.y += 1
 
-        if controller.a == 0 and (on_stair or on_floor):
+        if controller.a == 0 and (on_stair or on_floor) and self.ys >= 0:
             self.ys = 0.0
         super().tick()
 
@@ -695,7 +769,9 @@ controller = Controller()
 camera = Camera()
 menu = None
 debug = False
-platforms = []
+moving_platforms = []
+moving_blocks = []
+physics_elements = []
 # main_scene
 # tilemap
 # sprite_groups

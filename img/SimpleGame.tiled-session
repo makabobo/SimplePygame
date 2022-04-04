@@ -1,0 +1,41 @@
+{
+    "activeFile": "test_map.json",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "Alle Dateien (*)",
+    "fileStates": {
+        "Test-Tileset.json": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        },
+        "sprites_actors.json": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        },
+        "test_map.json": {
+            "scale": 4,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 207.125,
+                "y": 254.375
+            }
+        }
+    },
+    "last.imagePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img/asesprite",
+    "last.objectTemplatePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img",
+    "openFiles": [
+        "test_map.json",
+        "Test-Tileset.json",
+        "sprites_actors.json"
+    ],
+    "project": "SimpleGame.tiled-project",
+    "property.type": "object",
+    "recentFiles": [
+        "sprites_actors.json",
+        "Test-Tileset.json",
+        "test_map.json"
+    ]
+}

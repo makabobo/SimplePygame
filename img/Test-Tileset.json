@@ -1,18 +1,14 @@
 { "columns":16,
  "image":"tileset_test.png",
- "imageheight":64,
+ "imageheight":160,
  "imagewidth":256,
  "margin":0,
  "name":"tileset_test",
  "spacing":0,
- "tilecount":64,
- "tiledversion":"1.7.2",
+ "tilecount":160,
+ "tiledversion":"1.8.4",
  "tileheight":16,
  "tiles":[
-        {
-         "id":0,
-         "type":"WALL"
-        }, 
         {
          "id":2,
          "type":"WALL"
@@ -51,6 +47,14 @@
         }, 
         {
          "id":19,
+         "type":"WALL"
+        }, 
+        {
+         "id":20,
+         "type":"WALL"
+        }, 
+        {
+         "id":21,
          "type":"WALL"
         }, 
         {
@@ -178,32 +182,80 @@
         {
          "animation":[
                 {
-                 "duration":222,
-                 "tileid":17
+                 "duration":50,
+                 "tileid":51
                 }, 
                 {
-                 "duration":222,
-                 "tileid":17
-                }, 
-                {
-                 "duration":222,
-                 "tileid":17
-                }, 
-                {
-                 "duration":222,
-                 "tileid":16
-                }, 
-                {
-                 "duration":222,
-                 "tileid":16
-                }, 
-                {
-                 "duration":222,
-                 "tileid":16
+                 "duration":50,
+                 "tileid":52
                 }],
          "id":46
+        }, 
+        {
+         "animation":[
+                {
+                 "duration":100,
+                 "tileid":57
+                }, 
+                {
+                 "duration":100,
+                 "tileid":58
+                }, 
+                {
+                 "duration":100,
+                 "tileid":59
+                }, 
+                {
+                 "duration":100,
+                 "tileid":60
+                }, 
+                {
+                 "duration":100,
+                 "tileid":61
+                }, 
+                {
+                 "duration":100,
+                 "tileid":62
+                }],
+         "id":47
+        }, 
+        {
+         "id":48,
+         "type":"WALL"
+        }, 
+        {
+         "id":49,
+         "type":"WALL"
+        }, 
+        {
+         "id":50,
+         "type":"WALL"
+        }, 
+        {
+         "id":64,
+         "type":"WALL"
+        }, 
+        {
+         "id":65,
+         "type":"WALL"
+        }, 
+        {
+         "id":66,
+         "type":"WALL"
+        }, 
+        {
+         "id":80,
+         "type":"WALL"
+        }, 
+        {
+         "id":81,
+         "type":"WALL"
+        }, 
+        {
+         "id":82,
+         "type":"WALL"
         }],
  "tilewidth":16,
  "type":"tileset",
- "version":"1.6"
+ "version":"1.8"
 }
