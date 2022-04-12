@@ -50,7 +50,11 @@ while 1:
     if debug:
         draw_debug()
 
-    piprint("Hello", 10, 240)
+    piprint(message, 10, 240)
+    messagecounter += 1
+    if messagecounter >= 100:
+        messagecounter = 0
+        message = ""
 
     piprint(f"FPS {clock.get_fps():>3.1f}", 420,3, "darkred")
     clock.tick_busy_loop(60)

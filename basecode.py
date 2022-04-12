@@ -19,7 +19,7 @@ pygame.init()
 
 # Globals
 screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
-#screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
+# screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
 logging.getLogger().setLevel("INFO")
 
 ## PIPRINT
@@ -126,14 +126,13 @@ class Camera(Actor):
         if self.follow_obj:
             if self.follow_obj.r.centerx - self.x < self.border_width:
                 self.x = self.follow_obj.r.centerx - self.border_width
-            if self.x+self.w - self.follow_obj.r.centerx < self.border_width:
-                self.x = self.follow_obj.r.centerx +self.border_width-self.w
+            if self.x + self.w - self.follow_obj.r.centerx < self.border_width:
+                self.x = self.follow_obj.r.centerx + self.border_width - self.w
 
             if self.follow_obj.r.centery - self.y < self.border_width:
                 self.y = self.follow_obj.r.centery - self.border_width
-            if self.y+self.h - self.follow_obj.r.centery < self.border_width:
-                self.y = self.follow_obj.r.centery +self.border_width-self.h
-
+            if self.y + self.h - self.follow_obj.r.centery < self.border_width:
+                self.y = self.follow_obj.r.centery + self.border_width - self.h
 
             # self.y = self.follow_obj.r.centery-128
 
@@ -555,10 +554,38 @@ class Animation:
         surface.blit(self.images[0], pos)
 
 
+class Element2D:
+    def __init__(self, collision_rect):
+        self.r = collision_rect
+
+    def collides_with(self, other) -> bool:
+        pass
+
+    def stands_on(self, other) -> bool:
+        pass
+
+    def is_ground_for(self, other) -> bool:
+        pass
+
+    def h_move(self, vec) -> None:
+        # hard_move: moves by force, colliding elements were moved or squashed
+        pass
+
+    def s_move(self, vec) -> bool:
+        # soft_move: moves only if nothing blocks
+        pass
+
+    def tick(self):
+        pass
+
+    def draw(self):
+        pass
+
+
 class MovingBlock(Actor):
-    def __init__(self, x, y, w, h, xstart,xend):
+    def __init__(self, x, y, w, h, xstart, xend):
         super().__init__()
-        self.start_rect = pygame.Rect(x,y,w,h)
+        self.start_rect = pygame.Rect(x, y, w, h)
         self.r = self.start_rect.copy()
         self.direction = "RIGHT"
         self.x_start = xstart
@@ -573,7 +600,7 @@ class MovingBlock(Actor):
                 # Kollidierende Objekte verschieben
                 if pe.r.colliderect(tr):
                     if not pe.move2(1, 0):
-                        print("DEAD"+str(tr.x))
+                        pass  # Zerquetscht
                 # Darauf stehende Objekte verschieben
                 if not pe.r.colliderect(tr) and pe.r.move(0, 1).colliderect(tr):
                     pe.move2(1, 0)
@@ -586,21 +613,22 @@ class MovingBlock(Actor):
                 # Kollidierende Objekte verschieben
                 if pe.r.colliderect(tr):
                     if not pe.move2(-1, 0):
-                        print("DEAD"+str(tr.x))
+                        pass  # Zerquetscht
                 # Darauf stehende Objekte verschieben
-                if not pe.r.colliderect(tr) and pe.r.move(0, -1).colliderect(tr):
+                if not pe.r.colliderect(tr) and pe.r.move(0, 1).colliderect(tr):
                     pe.move2(-1, 0)
             self.r = tr
 
     def draw(self):
-        pygame.draw.rect(screen, "red", self.r.move(-camera.x,-camera.y), 1)
-        #screen.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
+        pygame.draw.rect(screen, "red", self.r.move(-camera.x, -camera.y), 1)
+        # screen.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
+
 
 class MovingPlatform(Actor):
-    def __init__(self, x, y, w, h, xstart,xend):
+    def __init__(self, x, y, w, h, xstart, xend):
         super().__init__()
         self.img = pygame.image.load("img/moving_platform.png")
-        self.start_rect = pygame.Rect(x,y,w,h)
+        self.start_rect = pygame.Rect(x, y, w, h)
         self.r = self.start_rect.copy()
         self.direction = "RIGHT"
         self.x_start = xstart
@@ -613,8 +641,8 @@ class MovingPlatform(Actor):
                 self.direction = "LEFT"
             for pe in physics_elements:
                 if not pe.r.colliderect(self.r) and pe.r.move(0, 1).colliderect(self.r):
-                #if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
-                    #pe.r.move_ip(1, 0)
+                    # if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
+                    # pe.r.move_ip(1, 0)
                     pe.move2(1, 0)
         else:
             self.r.x -= 1
@@ -622,13 +650,13 @@ class MovingPlatform(Actor):
                 self.direction = "RIGHT"
             for pe in physics_elements:
                 if not pe.r.colliderect(self.r) and pe.r.move(0, 1).colliderect(self.r):
-                #if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
-                    #pe.r.move_ip(-1, 0)
-                    pe.move2(-1,0)
-
+                    # if pe.r.colliderect(self.r) or pe.r.move(0, 1).colliderect(self.r):
+                    # pe.r.move_ip(-1, 0)
+                    pe.move2(-1, 0)
 
     def draw(self):
         screen.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
+
 
 ######################################################################
 # Für Player-Sprites, Gegner, bewegliche Objekte
@@ -708,8 +736,9 @@ class TilemapActor(Actor):
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         collision_rects = self.tmap.get_collision_tiles(tr, Tile.STAIR)
         collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for tile_rect in collision_rects:
-            tile_rect.h = 1
+            tile_rect.copy().h = 1
             if tr.colliderect(tile_rect):
                 return True
         return False
@@ -769,6 +798,10 @@ controller = Controller()
 camera = Camera()
 menu = None
 debug = False
+
+message = "sdf"
+messagecounter = 0
+
 moving_platforms = []
 moving_blocks = []
 physics_elements = []
