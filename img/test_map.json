@@ -107,8 +107,6 @@
          "height":100,
          "id":1,
          "name":"Kachelebene 1",
-         "offsetx":-32,
-         "offsety":-3.33333333333331,
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -122,27 +120,16 @@
          "name":"Objektebene 1",
          "objects":[
                 {
-                 "height":61,
-                 "id":60,
-                 "name":"door_trigger",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":28.6666666666667,
-                 "x":768.666666666667,
-                 "y":238.333333333333
-                }, 
-                {
                  "height":0,
                  "id":71,
-                 "name":"player_start",
+                 "name":"playerstart",
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"trigger_point",
                  "visible":true,
                  "width":0,
-                 "x":283.333333333333,
-                 "y":190
+                 "x":248,
+                 "y":228
                 }, 
                 {
                  "gid":164,
@@ -150,23 +137,33 @@
                  "id":78,
                  "name":"mp1",
                  "rotation":0,
-                 "type":"moving-platform",
+                 "type":"moving_platform",
                  "visible":true,
                  "width":64,
-                 "x":348,
-                 "y":258.333333333333
+                 "x":345.333333333333,
+                 "y":253.666666666666
                 }, 
                 {
-                 "gid":168,
-                 "height":64,
-                 "id":83,
-                 "name":"mv1",
+                 "height":11,
+                 "id":60,
+                 "name":"acid_bath",
                  "rotation":0,
-                 "type":"moving-block",
+                 "type":"trigger_rect",
                  "visible":true,
-                 "width":40.6666666666667,
-                 "x":144,
-                 "y":256
+                 "width":41.3333333333334,
+                 "x":914.666666666667,
+                 "y":306.333333333333
+                }, 
+                {
+                 "height":123.6667,
+                 "id":86,
+                 "name":"eingang",
+                 "rotation":0,
+                 "type":"trigger_rect",
+                 "visible":true,
+                 "width":20.6666333333334,
+                 "x":528.666683333333,
+                 "y":178.833316666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -175,7 +172,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":84,
+ "nextobjectid":87,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.8.4",
