@@ -16,11 +16,11 @@
             "scaleInEditor": 4
         },
         "test_map.json": {
-            "scale": 1.5,
+            "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 357,
-                "y": 266.3333333333333
+                "x": 381.5,
+                "y": 223.5
             }
         }
     },

@@ -14,26 +14,24 @@ import json
 
 import ctypes
 
+import basecode
+
 logging.getLogger().setLevel("INFO")
 
 ctypes.windll.user32.SetProcessDPIAware()
 pygame.init()
 
-
-class Screen:
-    pass
+pygame.mixer.init()
+sound_select1 = pygame.mixer.Sound("./sounds/sfx_12.wav")
+sound_select2 = pygame.mixer.Sound("./sounds/sfx_7.wav")
 
 # Globals
+#screen = pygame.display.set_mode((1920, 1080), pygame.SCALED | pygame.RESIZABLE, vsync=1)
 screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
-# screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
+#screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
 
 draw_surface = pygame.Surface((480,256))
-screen_rotation_degree = 0.0
-screen_scale = 0.0
-screen_opacity = 1.0
-screen_background_color = pygame.Color("#000000")
-
-
+#draw_surface = pygame.Surface((1920,1080))
 
 ## PIPRINT
 font = Font("mago3.ttf", 16, bold=False, italic=False)
@@ -44,6 +42,34 @@ pico_colors = ["black", "darkblue", "darkred", "darkgreen",
 last_color = 7
 
 print_map = {}
+
+# TODO: XL: Konzept für Level-Design (Zeichnung)
+
+# Optimierungen
+# TODO: Optimierung: Zusammenführen der Elemente die ticks() erhalten..
+# TODO: Optimierung: Event-Handling: Anforderungen definieren (Bullets und Player/Gegner, Trigger, Trigger f. Gegner, Türen)
+# TODO: Optimierung: Surface-Handling in Viewport Klasse verschieben
+# TODO: Optimierung: Alle Drawcalls mit Delta (ms)
+# TODO: Optimierung: Camera: Einfache Berechnung von Screen-Positionen
+# TODO: Optimierung: Player-Animation in separate Methode bzw. Animation-Manager-Klasse
+# TODO: for _ in ... umsetzen
+
+# Features
+# TODO: Animationen
+# TODO: Animation/Effect für Tod & Neustart
+# TODO: Debug Nachrichten
+# TODO: Layer
+# TODO: Text-Nachrichten
+# TODO: Sounds!
+# TODO: Schüsse & Bullets
+# TODO: Einfaches Partikel-System
+# TODO: (Einfache) Explosionen
+# TODO: Einfacher Gegner
+# TODO: Controller-Support
+# TODO: Animationen für Sprung, Stehen, Schießen
+# TODO: (x,y)-Positionen als Typ float
+# TODO: MovingBlock und Platform: Weichere Bewegung
+
 
 
 def piprint(text, x, y, color="white"):
@@ -111,6 +137,7 @@ class Actor:
     def __init__(self):
         self.dirty = False
 
+
     def tick(self):
         pass
 
@@ -122,6 +149,7 @@ class Actor:
 
 
 class Camera(Actor):
+
     def __init__(self):
         super().__init__()
         self.follow_obj = None
@@ -129,6 +157,8 @@ class Camera(Actor):
         self.y = 0
         self.w = 480
         self.h = 256
+
+
         self.border_width = 100
         self.r = pygame.Rect(0, 0, 480, 256)
 
@@ -178,8 +208,9 @@ class TestScene2(Actor):
 
 
 class Menu(Actor):
-    def __init__(self):
+    def __init__(self, name):
         super().__init__()
+        self.name = name
         self.pos = 0
         self.items = []
         pass
@@ -187,31 +218,38 @@ class Menu(Actor):
     def tick(self):
         # Clicked
         if controller.a == 1:
+            sound_select2.play()
             self.clicked(self.items[self.pos])
-
         # Up
         if controller.down == 1:
             self.pos += 1
+            sound_select1.play()
         if self.pos >= len(self.items):
             self.pos = 0
         # Down
         if controller.up == 1:
             self.pos -= 1
+            sound_select1.play()
         if self.pos == -1:
             self.pos = len(self.items) - 1
 
     def draw(self):
-        x = 40
-        y = 40
+        x = 180
+        y = 110
         yd = 15
-
+        pygame.draw.rect(draw_surface, "black", pygame.Rect(160,80, 200,100))
         num = 0
+        piprint(self.name, x, 80 +5, "white")
         for item in self.items:
             if num == self.pos:
+                # Ausgewählter Menüpunkt
                 piprint(">", x + 2, y, "white")
-                piprint(item, x + 10, y, "white")
+                piprint(item[0], x + 10, y, "white")
+                piprint(item[1], x + 140, y, "white")
             else:
-                piprint(item, x + 10, y, "red")
+                # Nicht ausgewählte Menüpunkte
+                piprint(item[0], x + 10, y, "red")
+                piprint(item[1], x + 140, y, "red")
             y += yd
             num += 1
 
@@ -221,23 +259,22 @@ class Menu(Actor):
 
 class MainMenu(Menu):
     def __init__(self):
-        super().__init__()
-        self.items = ["STORY-MODE", "MULTIPLAYER", "OPTIONS", "EDITOR", "EXIT"]
+        super().__init__("Main Menu")
+        self.items = [["TOGGLE FULLSCREEN",""], ["RESTART LEVEL",""], ["DEBUG","off"], ["EXIT",""]]
 
     def clicked(self, item):
-        if item == "EXIT":
-            sys.exit()
-
-
-class OptionsMenu(Menu):
-    def __init__(self):
-        super().__init__()
-        self.items = ["SCENE 1", "SCENE 2", "TOGGLE FULLSCREEN", "EXIT"]
-
-    def clicked(self, item):
-        if item == "TOGGLE FULLSCREEN":
+        global debug, draw_surface
+        if item[0] == "TOGGLE FULLSCREEN":
             pygame.display.toggle_fullscreen()
-        if item == "EXIT":
+        if item[0] == "DEBUG":
+            if debug:
+                debug = False
+                self.items[2][1] = "off"
+            else:
+                debug = True
+                self.items[2][1] = "on"
+            #pygame.display.toggle_fullscreen()
+        if item[0] == "EXIT":
             sys.exit()
 
 
@@ -530,16 +567,20 @@ class Tilemap:
                     pygame.draw.line(draw_surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
 
 
+
+
 class Animation:
-    def __init__(self, imgpath, width, tpi, xflip=False, repeat=True):
+    def __init__(self, imgpath, width, xflip=False, repeat=True):
         if imgpath == "":
             return
         img = pygame.image.load(imgpath)
         img_count = int(math.floor(img.get_width() / width))
+
         self.images = []
         self.repeat = repeat
         self.actual_index = 0
         self.width = width
+        self.timer = 0
         self.height = img.get_height()
         self.end = False
         for i in range(img_count):
@@ -549,19 +590,14 @@ class Animation:
                 anim_img = pygame.transform.flip(anim_img, True, False)
             self.images.append(anim_img)
 
-    def load(self, imgpath, width, tpi, xflip=False, repeat=True):
-        pass
-
-    def reset(self):
-        self.end = False
-        self.actual_index = 0
-
-    def tick(self):
-        if self.end:
-            return
-
-    def draw(self, surface, pos):
-        surface.blit(self.images[0], pos)
+    def draw(self, surface, pos, delta):
+        self.timer += delta
+        if self.timer > 100:
+            self.timer = 0
+            self.actual_index += 1
+            if self.actual_index == len(self.images):
+                self.actual_index = 0
+        surface.blit(self.images[self.actual_index], pos)
 
 
 ################################################################################################
@@ -571,21 +607,29 @@ class TriggerRect(Actor):
         self.name = name
         self.r = pygame.Rect(x, y, w, h)
 
+    def tick(self):
+        #print(player.r)
+        if player.r.colliderect(self.r):
+           print(f'Collision with {self.name}')
+
     def draw(self):
-        pygame.draw.rect(draw_surface, "yellow", self.r.move(-camera.x, -camera.y), 1, 1)
-        piprint(self.name, self.r.x-camera.x+2, self.r.y-camera.y+2, "gray")
+        if debug:
+            pygame.draw.rect(draw_surface, "yellow", self.r.move(-camera.x, -camera.y), 1, 1)
+            piprint(self.name, self.r.x-camera.x+2, self.r.y-camera.y+2, "gray")
 
 class TriggerPoint(Actor):
     def __init__(self, name, x, y):
         self.name = name
         self.p = [x,y]
     def draw(self):
-        pygame.draw.circle(draw_surface, "yellow", (self.p[0] - camera.x, self.p[1] - camera.y), 1)
-        piprint(self.name, self.p[0]-camera.x, self.p[1]-camera.y, "gray")
+        if debug:
+            pygame.draw.circle(draw_surface, "yellow", (self.p[0] - camera.x, self.p[1] - camera.y), 1)
+            piprint(self.name, self.p[0]-camera.x, self.p[1]-camera.y, "gray")
 
 
 ################################################################################################
 # Für Player-Sprites, Gegner, bewegliche Objekte
+
 class Node2D(Actor):
     def __init__(self, x, y, w, h, tilemap):
         super().__init__()
@@ -621,7 +665,7 @@ class Node2D(Actor):
         return self.r.centery
 
 
-    def smove(self, xd, yd, ignore_stairs=False):
+    def move_soft(self, xd, yd, ignore_stairs=False):
         blocked = False
         if xd:
             if not self.move2(xd, 0):
@@ -672,14 +716,14 @@ class Node2D(Actor):
         self.r = tr
         return not blocked
 
-    def hmove(self, xd,yd ) -> None:
+    def move_hard(self, xd, yd) -> None:
         # hard_move: moves by force, colliding elements were moved or squashed
         rect_dest = self.r.move(xd, yd)
         for pe in physics_elements:
             # Kollidierende Objekte verschieben
             if pe.r.colliderect(rect_dest):
                 if not pe.move2(xd, yd):
-                    pass  # Zerquetscht
+                    vp.shake()  # Zerquetscht
             # Darauf stehende Objekte verschieben
             if not pe.r.colliderect(rect_dest) and pe.r.move(0, 1).colliderect(rect_dest):
                 pe.move2(xd, yd)
@@ -715,7 +759,7 @@ class Node2D(Actor):
         if self.ys > 7.0:
             self.ys = 7.0
 
-        self.smove(self.xs, self.ys)
+        self.move_soft(self.xs, self.ys)
 
     def draw(self):
         pass
@@ -731,23 +775,24 @@ class Node2D(Actor):
 
 ################################################################################################
 
+
 class MovingBlock(Node2D):
-    def __init__(self, x, y, w, h, map, xstart, xend):
+    def __init__(self, x, y, w, h, map, ystart, yend):
         super().__init__(x,y,w,h,map)
         self.start_rect = pygame.Rect(x, y, w, h)
         self.r = self.start_rect.copy()
         self.direction = "RIGHT"
-        self.x_start = xstart
-        self.x_end = xend
+        self.y_start = ystart
+        self.y_end = yend
 
     def tick(self):
         if self.direction == "RIGHT":
-            self.hmove(1,0)
-            if self.x >= self.x_end:
+            self.move_hard(0, 1)
+            if self.y >= self.y_end:
                 self.direction = "LEFT"
         else:
-            self.hmove(-1,0)
-            if self.x <= self.x_start:
+            self.move_hard(0, -1)
+            if self.y <= self.y_start:
                 self.direction = "RIGHT"
 
     def draw(self):
@@ -787,9 +832,11 @@ class MovingPlatform(Node2D):
 
 class Player(Node2D):
     def __init__(self, tilemap, x, y):
-        super().__init__(x, y, 16, 32, tilemap)
+        super().__init__(x, y, 8, 48, tilemap)
+        self.anim_right = Animation("./img/player.png", 24, False)
+        self.anim_left  = Animation("./img/player.png", 24, True)
 
-    def tick(self):
+    def tick(self, delta):
         on_floor = self.on_floor()  # wird mehrmals benötigt
         on_stair = self.on_stair()  # wird mehrmals benötigt
 
@@ -811,18 +858,55 @@ class Player(Node2D):
             self.ys = 0.0
         super().tick()
 
-    def draw(self):
-        pygame.draw.rect(draw_surface, "white", self.r.move(-camera.x, -camera.y), 1, 7)
+    def draw(self, delta):
+        #pygame.draw.rect(draw_surface, "red", self.r.move(-camera.x, -camera.y), 1, 7)
+        if controller.left:
+            self.anim_left.draw(draw_surface, (self.r.x - camera.x-6, self.r.y - camera.y), delta)
+        else:
+            self.anim_right.draw(draw_surface, (self.r.x - camera.x-6, self.r.y - camera.y), delta)
+
+class Viewport(Actor):
+    def __init__(self):
+        self.rotation_degree = 0.0
+        self.scale = 1.0
+        self.alpha = 255
+        self.bg_color = pygame.Color("black")
+
+        self.timer_shake = 99999
+        self.timer_fade_in = 99999
+        self.timer_fade_out = 99999
+
+    def shake(self):
+        self.timer_shake = 1
 
 
-db_rects = []
+    def fade_out(self):
+        if self.timer_fade_in >= 500 and self.timer_fade_out >= 500:
+            self.timer_fade_out = 0
+            self.alpha = 255
 
+    def fade_in(self):
+        if self.timer_fade_in >= 500  and self.timer_fade_out >= 500:
+            self.timer_fade_in = 0
+            self.alpha = 0
 
-def draw_debug():
-    for r in db_rects:
-        pygame.draw.rect(draw_surface, "red", r.smove(-camera.x, -camera.y), 1)
-    db_rects.clear()
+    def tick(self, delta):
 
+        if self.timer_shake < 700:
+            self.rotation_degree = math.sin(self.timer_shake / 25) * 1.2 * (1 - (self.timer_shake/700))
+            self.timer_shake += delta
+        else:
+            self.rotation_degree = 0
+
+        if self.timer_fade_out < 500:
+            self.timer_fade_out += delta
+            self.alpha = 255 * (self.timer_fade_out/500)
+
+        if self.timer_fade_in < 500:
+            self.timer_fade_in += delta
+            self.alpha = 255 * ((500-self.timer_fade_in)/500)
+
+vp=Viewport()
 
 controller = Controller()
 camera = Camera()
@@ -837,9 +921,6 @@ moving_blocks = []
 physics_elements = []
 triggers = []
 
-# main_scene
-# tilemap
-# sprite_groups
-# level
-# game_progress
-# debug
+player = Player(map, 300, 190)
+
+
