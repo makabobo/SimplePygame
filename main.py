@@ -1,23 +1,16 @@
 import pygame
 import sys
 from math import *
-from basecode import *
+from base import *
 
 
 clock = pygame.time.Clock()
 
-map = Tilemap()
-map.load("./img/test_map.json")
+#moving_platforms.append(MovingPlatform(190, 260, 64, 8, map, 190, 320))
+#moving_blocks.append(MovingBlock(130, 134, 30, 30, map, 134, 300))
 
-
-player = Player(map, 300, 190)
-physics_elements.append(player)
-
-moving_platforms.append(MovingPlatform(190, 260, 64, 8, map, 190, 320))
-moving_blocks.append(MovingBlock(130, 134, 30, 30, map, 134, 300))
-
-moving_platforms.append(MovingPlatform(480, 260, 64, 8, map, 480, 650))
-moving_blocks.append(MovingBlock(650, 240, 64, 8, map, 240, 300))
+#moving_platforms.append(MovingPlatform(480, 260, 64, 8, map, 480, 650))
+#moving_blocks.append(MovingBlock(650, 240, 64, 8, map, 240, 300))
 
 camera.follow(player)
 
@@ -34,11 +27,6 @@ while 1:
             vp.fade_in()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
             vp.fade_out()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            if menu == None:
-                menu = MainMenu()
-            else:
-                menu = None
 
 
     # Tick ###########
@@ -47,21 +35,21 @@ while 1:
         menu.tick()
     else:
         map.tick()
-        for _ in moving_platforms + moving_blocks + triggers:
+        for _ in base.moving_platforms + moving_blocks + triggers:
             _.tick()
-        player.tick(delta)
+        base.player.tick(delta)
         camera.tick()
         vp.tick(delta)
 
     # Draw ###########
     draw_surface.fill(map.backgroundcolor)
     map.draw()
-    for _ in moving_platforms+moving_blocks + triggers:
+    for _ in base.moving_platforms + moving_blocks + triggers:
         _.draw()
     if menu is None:
-        player.draw(delta)
+        base.player.draw(delta)
     else:
-        player.draw(0)
+        base.player.draw(0)
         menu.draw()
 
 

@@ -16,11 +16,11 @@
             "scaleInEditor": 4
         },
         "test_map.json": {
-            "scale": 1,
+            "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 381.5,
-                "y": 223.5
+                "x": 428.3333333333333,
+                "y": 261
             }
         }
     },
@@ -32,7 +32,7 @@
         "sprites_actors.json"
     ],
     "project": "SimpleGame.tiled-project",
-    "property.type": "object",
+    "property.type": "string",
     "recentFiles": [
         "sprites_actors.json",
         "Test-Tileset.json",

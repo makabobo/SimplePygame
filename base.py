@@ -14,7 +14,7 @@ import json
 
 import ctypes
 
-import basecode
+import base
 
 logging.getLogger().setLevel("INFO")
 
@@ -79,17 +79,6 @@ def piprint(text, x, y, color="white"):
         s = font.render(text, False, color)
         print_map[(text, color)] = s
         draw_surface.blit(s, (x, y))
-
-
-## circ
-
-def circ(x, y, r, color=7, surface=draw_surface):
-    pygame.draw.circle(surface, pico_colors[color % 16], (x, y), r, width=1)
-
-
-def circfill(x, y, r, color=7, surface=draw_surface):
-    pygame.draw.circle(surface, pico_colors[color % 16], (x, y), r, width=0)
-
 
 class Controller:
     def __init__(self):
@@ -490,6 +479,10 @@ class Tilemap:
             #
             elif layer["type"] == "objectgroup":
                 for o in layer["objects"]:
+                    if o["type"] == "moving_platform":
+                        triggers.append(TriggerRect(o["name"], o["x"],o["y"], o["width"], o["height"]))
+
+                        logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
                     if o["type"] == "trigger_rect":
                         triggers.append(TriggerRect(o["name"], o["x"],o["y"], o["width"], o["height"]))
                         logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
@@ -777,22 +770,22 @@ class Node2D(Actor):
 
 
 class MovingBlock(Node2D):
-    def __init__(self, x, y, w, h, map, ystart, yend):
+    def __init__(self, x, y, w, h, map, xstart, xend):
         super().__init__(x,y,w,h,map)
         self.start_rect = pygame.Rect(x, y, w, h)
         self.r = self.start_rect.copy()
         self.direction = "RIGHT"
-        self.y_start = ystart
-        self.y_end = yend
+        self.x_start = xstart
+        self.x_end = xend
 
     def tick(self):
         if self.direction == "RIGHT":
-            self.move_hard(0, 1)
-            if self.y >= self.y_end:
+            self.move_hard(1, 0)
+            if self.x >= self.x_end:
                 self.direction = "LEFT"
         else:
-            self.move_hard(0, -1)
-            if self.y <= self.y_start:
+            self.move_hard(-1, 0)
+            if self.x <= self.x_start:
                 self.direction = "RIGHT"
 
     def draw(self):
@@ -921,6 +914,10 @@ moving_blocks = []
 physics_elements = []
 triggers = []
 
+map = Tilemap()
+map.load("./img/test_map.json")
 player = Player(map, 300, 190)
+
+physics_elements.append(player)
 
 
