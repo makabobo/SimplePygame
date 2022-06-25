@@ -1,7 +1,7 @@
 import pygame
 import sys
 from math import *
-from base import *
+from old_base import *
 
 
 clock = pygame.time.Clock()
@@ -35,21 +35,21 @@ while 1:
         menu.tick()
     else:
         map.tick()
-        for _ in base.moving_platforms + moving_blocks + triggers:
+        for _ in old_base.moving_platforms + moving_blocks + triggers:
             _.tick()
-        base.player.tick(delta)
+        old_base.player.tick(delta)
         camera.tick()
         vp.tick(delta)
 
     # Draw ###########
     draw_surface.fill(map.backgroundcolor)
     map.draw()
-    for _ in base.moving_platforms + moving_blocks + triggers:
+    for _ in old_base.moving_platforms + moving_blocks + triggers:
         _.draw()
     if menu is None:
-        base.player.draw(delta)
+        old_base.player.draw(delta)
     else:
-        base.player.draw(0)
+        old_base.player.draw(0)
         menu.draw()
 
 

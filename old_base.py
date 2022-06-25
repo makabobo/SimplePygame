@@ -14,7 +14,7 @@ import json
 
 import ctypes
 
-import base
+import old_base
 
 logging.getLogger().setLevel("INFO")
 

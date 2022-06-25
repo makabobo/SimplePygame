@@ -181,7 +181,8 @@ def start():
         else:
             menu.draw()
 
-        draw_text(f"FPS {clock.get_fps():>3.1f}", 420, 3, "darkred")
+        if debug:
+            draw_text(f"FPS {clock.get_fps():>3.1f}", 420, 3, "darkred")
 
         screen.blit(draw_surface, (0, 0))
         pygame.display.flip()
