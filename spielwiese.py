@@ -1,15 +1,12 @@
 import gamebase as g
-import pygame as pyg
-from gamehelper import *
-
+from pygame import *
 
 class MyActor(g.Actor):
-    def draw(self):
+    def draw(self, surface):
         for hue in range(0, 360, 10):
-            c = pygame.Color("black")
+            c = Color("black")
             c.hsla = (hue, 100, 50, 100)
-            pyg.draw.circle(g.draw_surface, c, (hue+40,100), 3)
-
+            draw.circle(surface, c, (hue+40,100), 3)
 
 g.actors.append(MyActor())
 g.start()
