@@ -2,6 +2,8 @@ import pygame
 import json
 import os
 import logging
+import math
+import sys
 
 logging.getLogger().setLevel("INFO")
 
@@ -48,8 +50,6 @@ class Tileset:
     def __init__(self):
         self.idmap = {}
         self.ids_anim = []
-        self.columns = 0
-        self.rows = 0
         self.tilecount = 0
         self.tileheight = 0
         self.tilewidth = 0
@@ -62,11 +62,11 @@ class Tileset:
         tileset_json = json.load(open(path))
 
         # Handelt es sich um ein Tileset mit Sprites statt Tiles?
-        if not "image" in tileset_json.keys():
+        if "image" not in tileset_json.keys():
             return  # wird nicht eingelesen
         logging.info(f'Lade Tileset "{path}"')
-        self.columns = tileset_json["columns"]
-        self.rows = math.floor(tileset_json["tilecount"] / self.columns)
+        columns = tileset_json["columns"]
+        rows = math.floor(tileset_json["tilecount"] / columns)
         self.tilecount = tileset_json["tilecount"]
         self.tileheight = tileset_json["tileheight"]
         self.tilewidth = tileset_json["tilewidth"]
@@ -74,7 +74,7 @@ class Tileset:
             fname = os.path.join(os.path.dirname(path), tileset_json["image"])
             self.img = pygame.image.load(fname)
         except FileNotFoundError:
-            print(f"Fehler. Datei '{fname}' nicht gefunden")
+            logging.error(f"Fehler. Tileset '{fname}' nicht gefunden")
             sys.exit()
         self.img.convert_alpha()
 
@@ -84,9 +84,9 @@ class Tileset:
             tiles_json = []
 
         js_anim_tiles = []
-        for row in range(self.rows):
-            for col in range(self.columns):
-                tile_id = row * self.columns + col
+        for row in range(rows):
+            for col in range(columns):
+                tile_id = row * columns + col
                 rect = pygame.Rect(self.tilewidth * col, self.tileheight * row, 16, 16)
                 sf = pygame.Surface((self.tilewidth, self.tileheight), pygame.SRCALPHA)
                 sf.blit(self.img, (0, 0), rect)
@@ -137,7 +137,6 @@ class Tileset:
             self.ids_anim.append(t)
 
         logging.info(f"Tileset '{path}' loaded successfully.")
-        logging.info(f"Tileset rows={self.rows}, columns={self.columns}, {len(self.tiles)} Elements")
 
     def get(self, tileid):
         if tileid in self.idmap.keys():

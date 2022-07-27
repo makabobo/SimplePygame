@@ -1,7 +1,8 @@
 import pygame
-import actor
 import sys
-import helper
+
+from .actor import *
+from .input import *
 
 class Menu(Actor):
     def __init__(self, name):

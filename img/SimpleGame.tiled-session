@@ -1,14 +1,44 @@
 {
-    "activeFile": "test_map.json",
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
     "expandedProjectPaths": [
         "."
     ],
     "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsx": {
+            "dynamicWrapping": false
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 217.75,
+                "y": 227.75
+            }
+        },
         "Test-Tileset.json": {
             "dynamicWrapping": false,
             "scaleInDock": 1.5,
-            "scaleInEditor": 4
+            "scaleInEditor": 5.5
+        },
+        "Test-Tileset2.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
         },
         "sprites_actors.json": {
             "dynamicWrapping": true,
@@ -19,23 +49,35 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 428.3333333333333,
-                "y": 261
+                "x": 1660.3333333333333,
+                "y": 1598.3333333333333
             }
         }
     },
-    "last.imagePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img/asesprite",
+    "frame.defaultDuration": 200,
+    "last.imagePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img",
     "last.objectTemplatePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img",
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
     "openFiles": [
-        "test_map.json",
-        "Test-Tileset.json",
-        "sprites_actors.json"
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj"
     ],
     "project": "SimpleGame.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "sprites_actors.json",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
+        "test_map.json",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj",
         "Test-Tileset.json",
-        "test_map.json"
-    ]
+        "sprites_actors.json",
+        "Test-Tileset2.tsx"
+    ],
+    "tileset.lastUsedFormat": "json",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
 }

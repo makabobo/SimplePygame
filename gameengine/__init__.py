@@ -1,14 +1,12 @@
-import json
-import math
 from pygame.font import *
 import pygame.draw
 import ctypes
 import sys
-import os
 import logging
 
+from .menu import *
 from .camera import *
-from .controller import *
+from .input import *
 
 logging.getLogger().setLevel("INFO")
 
@@ -22,17 +20,6 @@ draw_surface = pygame.Surface((480, 256))
 clock = pygame.time.Clock()
 actors = []
 
-# vp=Viewport()
-#
-# controller = Controller()
-
-# menu = None
-# debug = False
-#
-
-# moving_platforms = []
-# moving_blocks = []
-# physics_elements = []
 triggers = []
 camera = Camera()
 debug = False
