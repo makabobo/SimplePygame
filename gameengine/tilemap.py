@@ -59,14 +59,16 @@ class Tileset:
         """ Tileset erzeugen über Filepath
             'firstgid' wird bei mehreren Tilesets in einer Map enthalten sind.
         """
+        logging.info(f"Tileset.load: Aufruf Tileset.load('{path}', first_gid={first_gid})")
         tileset_json = json.load(open(path))
 
         # Handelt es sich um ein Tileset mit Sprites statt Tiles?
         if "image" not in tileset_json.keys():
             return  # wird nicht eingelesen
-        logging.info(f'Lade Tileset "{path}"')
+        logging.info(f'Tileset.load: Lade Tileset "{path}"')
         columns = tileset_json["columns"]
-        rows = math.floor(tileset_json["tilecount"] / columns)
+        rows = math.ceil(tileset_json["tilecount"] / columns)
+        logging.info(f"Tileset.load: Columns={columns}, Rows={rows}")
         self.tilecount = tileset_json["tilecount"]
         self.tileheight = tileset_json["tileheight"]
         self.tilewidth = tileset_json["tilewidth"]
@@ -74,32 +76,36 @@ class Tileset:
             fname = os.path.join(os.path.dirname(path), tileset_json["image"])
             self.img = pygame.image.load(fname)
         except FileNotFoundError:
-            logging.error(f"Fehler. Tileset '{fname}' nicht gefunden")
+            logging.error(f"Tileset.load: Fehler. Tileset '{fname}' nicht gefunden")
             sys.exit()
         self.img.convert_alpha()
 
+        # tile_info_json enthält für einige Tiles Zusatzinfos (Animationen oder Typ-Informationen ("WALL" etc.))
         if "tiles" in tileset_json:
-            tiles_json = tileset_json["tiles"]
+            tiles_list_json = tileset_json["tiles"]
         else:
-            tiles_json = []
+            tiles_list_json = []
 
-        js_anim_tiles = []
+        anim_tiles_json = []
+        # Alle
         for row in range(rows):
             for col in range(columns):
+                # ID berechnen
                 tile_id = row * columns + col
                 rect = pygame.Rect(self.tilewidth * col, self.tileheight * row, 16, 16)
                 sf = pygame.Surface((self.tilewidth, self.tileheight), pygame.SRCALPHA)
                 sf.blit(self.img, (0, 0), rect)
 
-                # Tile finden mit der richtigen id (Nur Tiles mit type oder Anim sind in json enthalten)
-                if search := [x for x in tiles_json if x["id"] == tile_id]:
+                # Ist die aktuelle tile_id in der Tiles_List enthalten?
+                if search := [x for x in tiles_list_json if x["id"] == tile_id]:
                     js_tile = search[0]
                 else:
+                    # Keine
                     js_tile = None
 
                 # Animation-Tiles erstmal zurückstellen...
                 if js_tile and "animation" in js_tile.keys():
-                    js_anim_tiles.append(js_tile)
+                    anim_tiles_json.append(js_tile)
                     continue
 
                 # Tiles mit Type-Flags
@@ -111,8 +117,8 @@ class Tileset:
                 self.tiles.append(t)
                 self.idmap[tile_id + first_gid] = t
 
-        # Jetzt die Animation-Tiles erstellen
-        for js_tile in js_anim_tiles:
+        # Jetzt die Animation-Tiles durchgehen und erstellen
+        for js_tile in anim_tiles_json:
             tile_id = js_tile["id"]
             # Flags berücksichtigen
             flags = ""
@@ -136,7 +142,7 @@ class Tileset:
             # Tiles in ids_anim erhalten ticks
             self.ids_anim.append(t)
 
-        logging.info(f"Tileset '{path}' loaded successfully.")
+        logging.info(f"Tileset.load: Tileset '{path}' loaded successfully. Tilecount={self.tilecount} Number of anim_tiles: {len(self.ids_anim)}")
 
     def get(self, tileid):
         if tileid in self.idmap.keys():
@@ -188,7 +194,7 @@ class Tilemap:
                 tileset.load(os.path.join(dirname, ts["source"]), ts["firstgid"])
                 self.tilesets.append(tileset)
             else:
-                logging.error(f"No tileset in Tilemap..")
+                logging.error(f"Tilemap.load: No tileset in Tilemap..")
 
         for layer in tilemap_json["layers"]:
             name = layer["name"]
@@ -209,26 +215,27 @@ class Tilemap:
                         # self.mapdata.append(map_temp[self.width * y:self.width * y + self.width])
                     self.mapdata.append(row)
 
-                logging.info(f"Tilemap-Layer '{name}' of size {self.width}*{self.height} imported..")
+                logging.info(f"Tilemap.load: Tilemap-Layer '{name}' of size {self.width}*{self.height} imported..")
 
             #
             # Object - Layer
             #
             elif layer["type"] == "objectgroup":
-                for o in layer["objects"]:
-                    if o["type"] == "moving_platform":
-                        triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
-
-                        logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
-                    if o["type"] == "trigger_rect":
-                        triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
-                        logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
-                    if o["type"] == "trigger_point":
-                        triggers.append(TriggerPoint(o["name"], o["x"], o["y"]))
-                        logging.info(f"TriggerPoint '{o['name']}' hinzugefügt")
-
-        logging.info(f"Tilemap {filepath} loaded successfully.")
-        logging.info(f"Tilemap width={self.width} height={self.height}")
+                pass
+                # for o in layer["objects"]:
+                #     if o["type"] == "moving_platform":
+                #         triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
+                #
+                #         logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
+                #     if o["type"] == "trigger_rect":
+                #         triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
+                #         logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
+                #     if o["type"] == "trigger_point":
+                #         triggers.append(TriggerPoint(o["name"], o["x"], o["y"]))
+                #         logging.info(f"TriggerPoint '{o['name']}' hinzugefügt")
+                #
+        logging.info(f"Tilemap.load: Tilemap width={self.width} height={self.height}")
+        logging.info(f"Tilemap.load: Tilemap {filepath} loaded successfully.")
 
     def get(self, celx, cely):
         return int(math.floor(celx / self.tilewidth)), int(math.floor(cely / self.tileheight))
@@ -264,7 +271,7 @@ class Tilemap:
         for _ in self.tilesets:
             _.tick()
 
-    def draw(self):
+    def draw(self, surface, camera, debug=False):
         first_tile_x = math.floor(camera.x / self.tilewidth)
         first_tile_y = math.floor(camera.y / self.tileheight)
         tiles2draw_hor = math.floor((camera.w / self.tilewidth)) + 2
@@ -285,13 +292,14 @@ class Tilemap:
                 draw_pos_x = (step_x * self.tilewidth) - offset_x
                 draw_pos_y = (step_y * self.tileheight) - offset_y
                 if tile_y < 0 or tile_y > (self.height - 1) or tile_x < 0 or tile_x > (self.width - 1):
+                    pass
                     # Grünes Gitter außerhalb der Map zeichnen (Debug)
                     if debug:
-                        pygame.draw.rect(draw_surface, pygame.Color("green"),
-                                         (int(draw_pos_x), int(draw_pos_y), self.tilewidth, self.tileheight), 1)
+                      pygame.draw.rect(surface, pygame.Color("green"),
+                                      (int(draw_pos_x), int(draw_pos_y), self.tilewidth, self.tileheight), 1)
                 else:
                     if tile := self.mapdata[tile_y][tile_x]:
-                        draw_surface.blit(tile.surface, (int(draw_pos_x), int(draw_pos_y)))
+                        surface.blit(tile.surface, (int(draw_pos_x), int(draw_pos_y)))
                 if debug:
-                    pygame.draw.line(draw_surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
+                    pygame.draw.line(surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
 

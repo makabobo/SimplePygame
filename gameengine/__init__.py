@@ -7,12 +7,12 @@ import logging
 from .menu import *
 from .camera import *
 from .input import *
+from .tilemap import *
 
 logging.getLogger().setLevel("INFO")
 
 pygame.init()
 ctypes.windll.user32.SetProcessDPIAware()
-
 
 screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
 
@@ -20,25 +20,14 @@ draw_surface = pygame.Surface((480, 256))
 clock = pygame.time.Clock()
 actors = []
 
-triggers = []
-camera = Camera()
+#camera = Camera()
 debug = False
 
-# map = Tilemap()
+map = Tilemap()
+map.load("test-map.tmj")
+
 # player = Player(map, 300, 190)
 
-font = Font("mago3.ttf", 16, bold=False, italic=False)
-print_map = {}
-def draw_text(text, x, y, color="white"):
-    global font
-    global print_map
-
-    if (text, color) in print_map.keys():
-        draw_surface.blit(print_map[(text, color)], (x, y))
-    else:
-        s = font.render(text, False, color)
-        print_map[(text, color)] = s
-        draw_surface.blit(s, (x, y))
 
 controller = Controller()
 menu = None
@@ -62,9 +51,16 @@ def start():
             a.tick(delta)
 
         if menu:
-            menu.tick(delta)
+            menu.tick(delta, controller)
+
+        if map:
+            map.tick()
 
         draw_surface.fill("black")
+
+        if map:
+            map.draw(draw_surface, pygame.Rect(0,0,480,256))
+
         for a in actors:
             a.draw(draw_surface)
 

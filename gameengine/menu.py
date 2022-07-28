@@ -3,6 +3,7 @@ import sys
 
 from .actor import *
 from .input import *
+from .util import *
 
 class Menu(Actor):
     def __init__(self, name):
@@ -12,7 +13,7 @@ class Menu(Actor):
         self.items = []
         pass
 
-    def tick(self, delta):
+    def tick(self, delta, controller):
         # Clicked
         if controller.a == 1:
             # sound_select2.play()
@@ -36,17 +37,17 @@ class Menu(Actor):
         yd = 15
         pygame.draw.rect(surface, "darkgray", pygame.Rect(140, 80, 200, 100), 2)
         num = 0
-        draw_text(self.name, x + 44, 80 + 5, "darkgray")
+        draw_text(surface, self.name, x + 44, 80 + 5, "darkgray")
         for item in self.items:
             if num == self.pos:
                 # Ausgewählter Menüpunkt
-                draw_text(">", x + 2, y, "white")
-                draw_text(item[0], x + 10, y, "white")
-                draw_text(item[1], x + 140, y, "white")
+                draw_text(surface, ">", x + 2, y, "white")
+                draw_text(surface, item[0], x + 10, y, "white")
+                draw_text(surface, item[1], x + 140, y, "white")
             else:
                 # Nicht ausgewählte Menüpunkte
-                draw_text(item[0], x + 10, y, "red")
-                draw_text(item[1], x + 140, y, "red")
+                draw_text(surface, item[0], x + 10, y, "red")
+                draw_text(surface, item[1], x + 140, y, "red")
             y += yd
             num += 1
 

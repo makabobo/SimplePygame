@@ -1,12 +1,11 @@
 from gameengine import *
-from gameengine.tilemap import Tileset
+from gameengine.tilemap import Tilemap
 
 from pygame import *
 
 class MyActor(Actor):
     def __init__(self):
-        self.tileset = Tileset()
-        self.tileset.load("gameengine/test-tileset2.tsj")
+        pass
 
     def draw(self, surface):
         draw.circle(surface, "red", (240,128), 50, 3)
