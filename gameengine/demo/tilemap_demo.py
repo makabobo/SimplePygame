@@ -1,17 +1,16 @@
 from gameengine import *
-from gameengine.tilemap import Tilemap
-
-from pygame import *
 
 class MyActor(Actor):
     def __init__(self):
+        super().__init__()
         pass
 
     def draw(self, surface):
-        draw.circle(surface, "red", (240,128), 50, 3)
+        pass
 
 
-actors.append(MyActor())
-start()
+game.load_map("./test-map.tmj")
+game.actors.append(MyActor())
+game.start()
 
 

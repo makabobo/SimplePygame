@@ -26,8 +26,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 217.75,
-                "y": 227.75
+                "x": 245,
+                "y": 146.75
             }
         },
         "Test-Tileset.json": {
@@ -67,9 +67,9 @@
     "project": "SimpleGame.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "Test-Tileset.json",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
+        "Test-Tileset.json",
         "test_map.json",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj",
         "sprites_actors.json",

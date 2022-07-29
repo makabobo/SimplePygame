@@ -36,7 +36,7 @@ class Tile:
             self.frame_delay -= 1
             return
         else:
-            self.frame_delay = 5
+            self.frame_delay = 15
 
         if len(self.anim_surfaces) == 0:
             return

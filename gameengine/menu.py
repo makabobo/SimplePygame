@@ -1,8 +1,6 @@
-import pygame
 import sys
 
 from .actor import *
-from .input import *
 from .util import *
 
 class Menu(Actor):
@@ -35,6 +33,7 @@ class Menu(Actor):
         x = 160
         y = 110
         yd = 15
+        pygame.draw.rect(surface, "black", pygame.Rect(140, 80, 200, 100), 0)
         pygame.draw.rect(surface, "darkgray", pygame.Rect(140, 80, 200, 100), 2)
         num = 0
         draw_text(surface, self.name, x + 44, 80 + 5, "darkgray")

@@ -2,10 +2,9 @@ import pygame
 
 from pygame.font import *
 
-pygame.init()
-
 font = Font("mago3.ttf", 16, bold=False, italic=False)
 print_map = {}
+
 def draw_text(draw_surface, text, x, y, color="white"):
     global font
     global print_map
