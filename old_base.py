@@ -623,7 +623,7 @@ class TriggerPoint(Actor):
 ################################################################################################
 # Für Player-Sprites, Gegner, bewegliche Objekte
 
-class Node2D(Actor):
+class SpriteActor(Actor):
     def __init__(self, x, y, w, h, tilemap):
         super().__init__()
         self.r = pygame.Rect(x, y, w, h)
@@ -769,7 +769,7 @@ class Node2D(Actor):
 ################################################################################################
 
 
-class MovingBlock(Node2D):
+class MovingBlock(SpriteActor):
     def __init__(self, x, y, w, h, map, xstart, xend):
         super().__init__(x,y,w,h,map)
         self.start_rect = pygame.Rect(x, y, w, h)
@@ -793,7 +793,7 @@ class MovingBlock(Node2D):
 
 
 
-class MovingPlatform(Node2D):
+class MovingPlatform(SpriteActor):
     def __init__(self, x, y, w, h, map, xstart, xend):
         super().__init__(x,y,w,h,map)
         self.img = pygame.image.load("img/moving_platform.png")
@@ -823,7 +823,7 @@ class MovingPlatform(Node2D):
         draw_surface.blit(self.img, self.r.move(-camera.x, -camera.y).topleft)
 
 
-class Player(Node2D):
+class Player(SpriteActor):
     def __init__(self, tilemap, x, y):
         super().__init__(x, y, 8, 48, tilemap)
         self.anim_right = Animation("./img/player.png", 24, False)

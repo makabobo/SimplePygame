@@ -4,9 +4,10 @@ from .actor import *
 from .util import *
 
 class Menu(Actor):
-    def __init__(self, name):
+    def __init__(self, name, game):
         super().__init__()
         self.name = name
+        self.game = game
         self.pos = 0
         self.items = []
         pass
@@ -54,20 +55,19 @@ class Menu(Actor):
         pass
 
 class MainMenu(Menu):
-    def __init__(self):
-        super().__init__("Main Menu")
+    def __init__(self, game):
+        super().__init__("Main Menu", game)
         self.items = [["TOGGLE FULLSCREEN", ""], ["DEBUG", "off"], ["EXIT", ""]]
 
     def clicked(self, item):
-        global debug
         if item[0] == "TOGGLE FULLSCREEN":
             pygame.display.toggle_fullscreen()
         if item[0] == "DEBUG":
-            if debug:
-                debug = False
+            if self.game.debug:
+                self.game.debug = False
                 self.items[1][1] = "off"
             else:
-                debug = True
+                self.game.debug = True
                 self.items[1][1] = "on"
         if item[0] == "EXIT":
             sys.exit()

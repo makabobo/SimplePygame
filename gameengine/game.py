@@ -1,7 +1,6 @@
 from .menu import *
-from .camera import *
 from .input import *
-from .tilemap import *
+from .tile import *
 import pygame
 
 
@@ -29,7 +28,7 @@ class Game:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     if self.menu is None:
-                        self.menu = MainMenu()
+                        self.menu = MainMenu(self)
                     else:
                         self.menu = None
 
@@ -47,7 +46,7 @@ class Game:
             self.draw_surface.fill("black")
 
             if self.map:
-                self.map.draw(self.draw_surface, pygame.Rect(0,0,480,256))
+                self.map.draw(self.draw_surface, pygame.Rect(0,0,480,256), self.debug)
 
             for a in self.actors:
                 a.draw(self.draw_surface)
@@ -58,7 +57,7 @@ class Game:
                 self.menu.draw(self.draw_surface)
 
             if self.debug:
-                draw_text(f"FPS {self.__clock.get_fps():>3.1f}", 420, 3, "darkred")
+                draw_text(self.draw_surface, f"FPS {self.__clock.get_fps():>3.1f}", 420, 3, "darkred")
 
             self.screen.blit(self.draw_surface, (0, 0))
             pygame.display.flip()
