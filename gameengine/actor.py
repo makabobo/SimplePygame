@@ -1,17 +1,17 @@
 import pygame
-# from tile import *
+from .tile import Tile
+from .animation import Animation
+
 
 class Actor:
 
     def __init__(self):
-        self.alpha = 100
-        self.rotation = 0
-        self.scale = 1.0
+        self.dirty = False
 
-    def tick(self, timedelta):
+    def tick(self, game):
         pass
 
-    def draw(self, surface):
+    def draw(self, surface, delta):
         pass
 
 class SpriteActor(Actor):
@@ -71,7 +71,7 @@ class SpriteActor(Actor):
             collision_rects = []
             if self.tilemap:
                 collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
-            collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
+            #collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
             for collider in collision_rects:
 
@@ -92,34 +92,45 @@ class SpriteActor(Actor):
                 if yd < 0:
                     if tr.top < collider.bottom:
                         tr.top = collider.bottom
+
+
+            # Variante mit beweglichen Platformen
+            # if yd > 0:
+            #     for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
+            #         if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
+            #             tr.bottom = stair_tile.top
+
             if yd > 0:
-                for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
-                    # wenn mit treppe kollidiert und im letzten Frame vollständig oberhalb des Tiles war
-                    if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
+                for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR):
+                    if tr.colliderect( stair_tile ) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
         self.r = tr
         return not blocked
-    # moving_platforms: Player Kollisionsabfrage
+
+    # moving_blocks
+    # moving_platforms: Bewegliche Treppe/Platform
+    # physics objects: Soft-Objekt (Player)
 
 
-    def move_hard(self, xd, yd) -> None:
-        """ hard_move: moves by force, colliding elements were moved or squashed"""
-        rect_dest = self.r.move(xd, yd)
-        for pe in physics_elements:
-            # Kollidierende Objekte verschieben
-            if pe.r.colliderect(rect_dest):
-                if not pe.move2(xd, yd):
-                    vp.shake()  # Zerquetscht
-            # Darauf stehende Objekte verschieben
-            if not pe.r.colliderect(rect_dest) and pe.r.move(0, 1).colliderect(rect_dest):
-                pe.move2(xd, yd)
-        self.r = rect_dest
+
+    # def move_hard(self, xd, yd) -> None:
+    #     """ hard_move: moves by force, colliding elements were moved or squashed"""
+    #     rect_dest = self.r.move(xd, yd)
+    #     for pe in physics_elements:
+    #         # Kollidierende Objekte verschieben
+    #         if pe.r.colliderect(rect_dest):
+    #             if not pe.move2(xd, yd):
+    #                 vp.shake()  # Zerquetscht
+    #         # Darauf stehende Objekte verschieben
+    #         if not pe.r.colliderect(rect_dest) and pe.r.move(0, 1).colliderect(rect_dest):
+    #             pe.move2(xd, yd)
+    #     self.r = rect_dest
 
     def on_floor(self):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
-        collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for tile_rect in collision_rects:
             tile_rect.h = 1
             if tr.colliderect(tile_rect):
@@ -130,15 +141,15 @@ class SpriteActor(Actor):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         collision_rects = self.tilemap.get_collision_tiles(tr, Tile.STAIR)
-        collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
-        collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
+        # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        # collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for tile_rect in collision_rects:
             tile_rect.copy().h = 1
             if tr.colliderect(tile_rect):
                 return True
         return False
 
-    def tick(self):
+    def tick(self, game):
         # Schwerkraft simulieren
         if not self.on_floor():
             self.ys += self.ya
@@ -158,3 +169,35 @@ class SpriteActor(Actor):
 
     def draw(self):
         pass
+
+class Player(SpriteActor):
+    def __init__(self, tilemap, x, y):
+        super().__init__(x, y, 8, 48, tilemap)
+        self.anim_right = Animation("./assets/player.png", 24, False)
+        self.anim_left  = Animation("./assets/player.png", 24, True)
+
+    def tick(self, game):
+        on_floor = self.on_floor()  # wird mehrmals benötigt
+        on_stair = self.on_stair()  # wird mehrmals benötigt
+
+        if game.controller.left:
+            self.xs = -2
+        elif game.controller.right:
+            self.xs = 2
+        else:
+            self.xs = 0
+        # Springen
+        if game.controller.a == 1 and not game.controller.down and (on_stair or on_floor):
+            self.ys = -6.7
+
+        # Von Treppe fallen lassen
+        if game.controller.a == 1 and game.controller.down and on_stair:
+            self.r.y += 1
+
+        if game.controller.a == 0 and (on_stair or on_floor) and self.ys >= 0:
+            self.ys = 0.0
+        super().tick(game)
+
+    def draw(self, surface, delta):
+        #pygame.draw.rect(draw_surface, "red", self.r.move(-camera.x, -camera.y), 1, 7)
+        self.anim_left.draw(surface, (self.r.x - 0, self.r.y - 0), delta)

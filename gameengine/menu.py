@@ -12,25 +12,25 @@ class Menu(Actor):
         self.items = []
         pass
 
-    def tick(self, delta, controller):
+    def tick(self, game):
         # Clicked
-        if controller.a == 1:
+        if game.controller.a == 1:
             # sound_select2.play()
             self.clicked(self.items[self.pos])
         # Up
-        if controller.down == 1:
+        if game.controller.down == 1:
             self.pos += 1
             # sound_select1.play()
         if self.pos >= len(self.items):
             self.pos = 0
         # Down
-        if controller.up == 1:
+        if game.controller.up == 1:
             self.pos -= 1
             # sound_select1.play()
         if self.pos == -1:
             self.pos = len(self.items) - 1
 
-    def draw(self, surface):
+    def draw(self, surface, delta):
         x = 160
         y = 110
         yd = 15

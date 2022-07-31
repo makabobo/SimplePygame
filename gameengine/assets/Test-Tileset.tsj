@@ -10,6 +10,14 @@
  "tileheight":16,
  "tiles":[
         {
+         "id":3,
+         "type":"WALL"
+        }, 
+        {
+         "id":15,
+         "type":"STAIR"
+        }, 
+        {
          "animation":[
                 {
                  "duration":400,

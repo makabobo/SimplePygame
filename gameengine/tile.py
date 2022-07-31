@@ -267,11 +267,11 @@ class Tilemap:
         logging.error(f"TileId {tid} from map not found..")
         sys.exit()
 
-    def tick(self):
+    def tick(self, game):
         for _ in self.tilesets:
             _.tick()
 
-    def draw(self, surface, camera, debug=False):
+    def draw(self, surface, delta, camera, debug=False):
         first_tile_x = math.floor(camera.x / self.tilewidth)
         first_tile_y = math.floor(camera.y / self.tileheight)
         tiles2draw_hor = math.floor((camera.w / self.tilewidth)) + 2

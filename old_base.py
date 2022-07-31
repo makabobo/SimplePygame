@@ -34,7 +34,7 @@ draw_surface = pygame.Surface((480,256))
 #draw_surface = pygame.Surface((1920,1080))
 
 ## PIPRINT
-font = Font("gameengine/mago3.ttf", 16, bold=False, italic=False)
+font = Font("gameengine/assets/mago3.ttf", 16, bold=False, italic=False)
 pico_colors = ["black", "darkblue", "darkred", "darkgreen",
                "brown", "darkgrey", "lightgrey", "white",
                "red", "orange", "yellow", "green",

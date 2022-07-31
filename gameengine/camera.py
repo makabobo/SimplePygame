@@ -18,7 +18,7 @@ class Camera(Actor):
     def follow(self, fobj):
         self.follow_obj = fobj
 
-    def tick(self):
+    def tick(self, game):
         if self.follow_obj:
             if self.follow_obj.r.centerx - self.x < self.border_width:
                 self.x = self.follow_obj.r.centerx - self.border_width

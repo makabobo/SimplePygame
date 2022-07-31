@@ -10,7 +10,7 @@ class Controller:
         self.left = 0
         self.right = 0
 
-    def tick(self, delta):
+    def tick(self):
         if pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[pygame.K_RETURN]:
             self.a += 1
         else:
