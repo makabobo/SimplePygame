@@ -1,7 +1,7 @@
 import pygame
 from .tile import Tile
 from .animation import Animation
-
+from .util import test_rect_lying_on_rect
 
 class Actor:
 
@@ -97,12 +97,12 @@ class SpriteActor(Actor):
             # Variante mit beweglichen Platformen
             # if yd > 0:
             #     for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
-            #         if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
+            #         if tr.colliderect(stair_tile) and tr.bottom - yd-1 <= stair_tile.top:
             #             tr.bottom = stair_tile.top
 
             if yd > 0:
                 for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR):
-                    if tr.colliderect( stair_tile ) and tr.bottom - yd <= stair_tile.top:
+                    if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
         self.r = tr
         return not blocked
@@ -128,24 +128,25 @@ class SpriteActor(Actor):
 
     def on_floor(self):
         """ detects ground """
+
+        # "Bodenplatte des Players berechnen
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
         collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
         # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for tile_rect in collision_rects:
-            tile_rect.h = 1
+            tile_rect.copy().h = 1
             if tr.colliderect(tile_rect):
                 return True
         return False
 
     def on_stair(self):
         """ detects ground """
-        tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        collision_rects = self.tilemap.get_collision_tiles(tr, Tile.STAIR)
+        rg = self.r.move(0,1)
+        collision_rects = self.tilemap.get_collision_tiles(rg, Tile.STAIR)
         # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         # collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
-        for tile_rect in collision_rects:
-            tile_rect.copy().h = 1
-            if tr.colliderect(tile_rect):
+        for cr in collision_rects:
+            if test_rect_lying_on_rect(self.r, cr):
                 return True
         return False
 
@@ -172,13 +173,15 @@ class SpriteActor(Actor):
 
 class Player(SpriteActor):
     def __init__(self, tilemap, x, y):
-        super().__init__(x, y, 8, 48, tilemap)
+        super().__init__(x, y, 28, 40, tilemap)
         self.anim_right = Animation("./assets/player.png", 24, False)
         self.anim_left  = Animation("./assets/player.png", 24, True)
 
     def tick(self, game):
         on_floor = self.on_floor()  # wird mehrmals benötigt
         on_stair = self.on_stair()  # wird mehrmals benötigt
+
+        game.debug_msg = f"on-stair={on_stair}, pos={self.x},{self.y}"
 
         if game.controller.left:
             self.xs = -2
@@ -200,4 +203,5 @@ class Player(SpriteActor):
 
     def draw(self, surface, delta):
         #pygame.draw.rect(draw_surface, "red", self.r.move(-camera.x, -camera.y), 1, 7)
-        self.anim_left.draw(surface, (self.r.x - 0, self.r.y - 0), delta)
+        pygame.draw.rect(surface, "red", self.r, 1)
+        self.anim_left.draw(surface, (self.r.x - 0, self.r.y - 10), delta)

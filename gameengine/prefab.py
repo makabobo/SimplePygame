@@ -13,7 +13,7 @@ class SimplePopup(Actor):
             print(f"Fehler bei Laden von {filename}: '{str(e)}'")
             sys.exit()
         self.pos = pos
-        self.restlife = 5 * 4
+        self.restlife = 5 * 40
 
     def tick(self, game):
         self.restlife -= 1
