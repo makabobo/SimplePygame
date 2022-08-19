@@ -4,6 +4,7 @@ from .tile import *
 from .prefab import SimplePopup
 import pygame
 from .actor import Player
+from .camera import Camera
 
 
 class Game:
@@ -14,19 +15,19 @@ class Game:
         self.menu = None
         self.debug = False
         self.debug_msg = ""
-
+        self.camera = Camera(self)
 
         self.screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
         self.__clock = pygame.time.Clock()
 
     def load_map(self, path):
-        self.map = Tilemap()
+        self.map = Tilemap(self)
         self.map.load(path)
 
     def start(self):
         delta = 0.0
-        self.actors.append(Player(self.map, 327,190))
+
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -46,17 +47,19 @@ class Game:
             # Controller muss als erstes tick() erhalten
             self.controller.tick()
 
-            for a in self.actors:
-                a.tick(self)
-
-            # Delete "old/dirty" Actors
-            self.actors = [a for a in self.actors if a.dirty is False]
-
             if self.menu:
-                self.menu.tick(self)
+                self.menu.tick()
+            else:
+                for a in self.actors:
+                    a.tick()
 
-            if self.map:
-                self.map.tick(self)
+                self.camera.tick()
+
+                # Delete "old/dirty" Actors
+                self.actors = [a for a in self.actors if a.dirty is False]
+
+                if self.map:
+                    self.map.tick()
 
             #########
             # DRAW
@@ -64,10 +67,10 @@ class Game:
             self.draw_surface.fill("black")
 
             if self.map:
-                self.map.draw(self.draw_surface, delta, pygame.Rect(0,0,480,256), self.debug)
+                self.map.draw(self.draw_surface, delta, self.camera)
 
             for a in self.actors:
-                a.draw(self.draw_surface, delta)
+                a.draw(self.draw_surface, delta, self.camera)
 
             if self.menu:
                 self.menu.draw(self.draw_surface, delta)

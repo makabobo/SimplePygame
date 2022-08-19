@@ -2,7 +2,7 @@ import pygame
 
 from pygame.font import *
 
-font = Font("assets/mago3.ttf", 16, bold=False, italic=False)
+font = Font("assets/pixelmix.ttf", 8, bold=False, italic=False)
 print_map = {}
 
 def draw_text(draw_surface, text, x, y, color="white"):
@@ -18,8 +18,8 @@ def draw_text(draw_surface, text, x, y, color="white"):
 
 
 def test_rect_lying_on_rect(r1:pygame.Rect, r2:pygame.Rect) -> bool:
-    """ Testet ob top_rect auf bottom_rect aufliegt, d.h.
-         - die untere Kante von top_rect berührt die obere Kante von bottom_rect
+    """ Testet ob r1 auf r2 aufliegt, d.h., dass die untere Kante von r1
+        die obere Kante von r2 mit mind. 1 Pixel berührt.
         Wird benötigt um zu prüfen ob ein Actor auf einem Boden steht/läuft
     """
     return r1.y+r1.h == r2.y and not (r1.x+r1.w <= r2.x or r2.x+r2.w <= r1.x)

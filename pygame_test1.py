@@ -41,7 +41,7 @@ while 1:
         cfuture_img.set_alpha(255)
         x += 0.5
         x %= 200
-        degree += 0.1
+        degree += 0.3
         counter += 1
         if counter >= 3:
             counter = 0
@@ -55,11 +55,10 @@ while 1:
 
 
         draw_surface.fill("#552222")
-        #draw_surface.blit(cfuture_img, (0, 0))
-        #draw_surface.blit(test_img3, ( x,  x))
-        sf = pygame.transform.rotozoom(test_img3, degree, 1 )
+        draw_surface.blit(cfuture_img, (0, 0))
+        sf = pygame.transform.rotozoom(test_img3, degree, 4 )
         #sf = pygame.transform.rotate(test_img3, degree)
-        #sf.set_alpha(180)
+        sf.set_alpha(210)
         x = 256 - (sf.get_width()/2)
         y = 128 - (sf.get_height()/2)
 

@@ -5,26 +5,25 @@ from .util import *
 
 class Menu(Actor):
     def __init__(self, name, game):
-        super().__init__()
+        super().__init__(game)
         self.name = name
-        self.game = game
         self.pos = 0
         self.items = []
         pass
 
-    def tick(self, game):
+    def tick(self):
         # Clicked
-        if game.controller.a == 1:
+        if self.game.controller.a == 1:
             # sound_select2.play()
             self.clicked(self.items[self.pos])
         # Up
-        if game.controller.down == 1:
+        if self.game.controller.down == 1:
             self.pos += 1
             # sound_select1.play()
         if self.pos >= len(self.items):
             self.pos = 0
         # Down
-        if game.controller.up == 1:
+        if self.game.controller.up == 1:
             self.pos -= 1
             # sound_select1.play()
         if self.pos == -1:
@@ -56,8 +55,8 @@ class Menu(Actor):
 
 class MainMenu(Menu):
     def __init__(self, game):
-        super().__init__("Main Menu", game)
-        self.items = [["TOGGLE FULLSCREEN", ""], ["DEBUG", "off"], ["EXIT", ""]]
+        super().__init__("MAIN MENU", game)
+        self.items = [["TOGGLE FULLSCREEN", ""], ["DEBUG", "OFF"], ["EXIT", ""]]
 
     def clicked(self, item):
         if item[0] == "TOGGLE FULLSCREEN":
@@ -65,10 +64,10 @@ class MainMenu(Menu):
         if item[0] == "DEBUG":
             if self.game.debug:
                 self.game.debug = False
-                self.items[1][1] = "off"
+                self.items[1][1] = "OFF"
             else:
                 self.game.debug = True
-                self.items[1][1] = "on"
+                self.items[1][1] = "ON"
         if item[0] == "EXIT":
             sys.exit()
 

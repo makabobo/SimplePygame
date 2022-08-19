@@ -3,20 +3,22 @@ from .tile import Tile
 from .animation import Animation
 from .util import test_rect_lying_on_rect
 
+
 class Actor:
 
-    def __init__(self):
+    def __init__(self, game):
         self.dirty = False
+        self.game = game
 
-    def tick(self, game):
+    def tick(self):
         pass
 
-    def draw(self, surface, delta):
+    def draw(self, surface, delta, camera=None):
         pass
 
 class SpriteActor(Actor):
-    def __init__(self, x, y, w, h, tilemap):
-        super().__init__()
+    def __init__(self, x, y, w, h, tilemap, game):
+        super().__init__(game)
         self.r = pygame.Rect(x, y, w, h)
         self.tilemap = tilemap
         self.xa = 0.0  # Acceleration
@@ -128,14 +130,12 @@ class SpriteActor(Actor):
 
     def on_floor(self):
         """ detects ground """
-
         # "Bodenplatte des Players berechnen
-        tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
+        rg = self.r.move(0,1)
+        collision_rects = self.tilemap.get_collision_tiles(rg, Tile.WALL)
         # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
-        for tile_rect in collision_rects:
-            tile_rect.copy().h = 1
-            if tr.colliderect(tile_rect):
+        for cr in collision_rects:
+            if test_rect_lying_on_rect(self.r, cr):
                 return True
         return False
 
@@ -150,7 +150,7 @@ class SpriteActor(Actor):
                 return True
         return False
 
-    def tick(self, game):
+    def tick(self):
         # Schwerkraft simulieren
         if not self.on_floor():
             self.ys += self.ya
@@ -168,40 +168,41 @@ class SpriteActor(Actor):
     def stands_on(self, other) -> bool:
         pass
 
-    def draw(self):
-        pass
 
 class Player(SpriteActor):
-    def __init__(self, tilemap, x, y):
-        super().__init__(x, y, 28, 40, tilemap)
+    def __init__(self, tilemap, x, y, game):
+        super().__init__(x, y, 28, 40, tilemap, game)
         self.anim_right = Animation("./assets/player.png", 24, False)
         self.anim_left  = Animation("./assets/player.png", 24, True)
 
-    def tick(self, game):
+    def tick(self):
         on_floor = self.on_floor()  # wird mehrmals benötigt
         on_stair = self.on_stair()  # wird mehrmals benötigt
 
-        game.debug_msg = f"on-stair={on_stair}, pos={self.x},{self.y}"
+        self.game.debug_msg = f"on-floor={on_floor}" #, pos={self.x},{self.y}"
 
-        if game.controller.left:
+        if self.game.controller.left:
             self.xs = -2
-        elif game.controller.right:
+        elif self.game.controller.right:
             self.xs = 2
         else:
             self.xs = 0
         # Springen
-        if game.controller.a == 1 and not game.controller.down and (on_stair or on_floor):
+        if self.game.controller.a == 1 and not self.game.controller.down and (on_stair or on_floor):
             self.ys = -6.7
 
+
         # Von Treppe fallen lassen
-        if game.controller.a == 1 and game.controller.down and on_stair:
+        if self.game.controller.a == 1 and self.game.controller.down and on_stair:
             self.r.y += 1
 
-        if game.controller.a == 0 and (on_stair or on_floor) and self.ys >= 0:
+        if self.game.controller.a == 0 and (on_stair or on_floor) and self.ys >= 0:
             self.ys = 0.0
-        super().tick(game)
+        super().tick()
 
-    def draw(self, surface, delta):
+    def draw(self, surface, delta, camera=None):
         #pygame.draw.rect(draw_surface, "red", self.r.move(-camera.x, -camera.y), 1, 7)
-        pygame.draw.rect(surface, "red", self.r, 1)
-        self.anim_left.draw(surface, (self.r.x - 0, self.r.y - 10), delta)
+        if self.game.debug:
+            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+
+        self.anim_left.draw(surface, self.r.move(-camera.x, -camera.y-10), delta)

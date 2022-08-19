@@ -154,15 +154,24 @@ class Tileset:
         for _ in self.ids_anim:
             _.tick()
 
+class TilemapObject:
+    def __init__(self, type, rect, subtype, id):
+        self.type = type  # "Point", "Rect"
+        self.r = rect
+        self.subtype = subtype
+        self.id = id
+
 
 class Tilemap:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.tileheight = 0
         self.tilewidth = 0
         self.width = 0
         self.height = 0
         self.backgroundcolor = pygame.Color("black")
         self.mapdata = []
+        self.object_layers = []
         self.tilesets = []
 
         self.last_collision_rects = []
@@ -221,19 +230,26 @@ class Tilemap:
             # Object - Layer
             #
             elif layer["type"] == "objectgroup":
-                pass
-                # for o in layer["objects"]:
-                #     if o["type"] == "moving_platform":
-                #         triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
-                #
-                #         logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
-                #     if o["type"] == "trigger_rect":
-                #         triggers.append(TriggerRect(o["name"], o["x"], o["y"], o["width"], o["height"]))
-                #         logging.info(f"TriggerRect '{o['name']}' hinzugefügt")
-                #     if o["type"] == "trigger_point":
-                #         triggers.append(TriggerPoint(o["name"], o["x"], o["y"]))
-                #         logging.info(f"TriggerPoint '{o['name']}' hinzugefügt")
-                #
+                for o in layer["objects"]:
+                    if "point" in o.keys():
+                        self.object_layers.append(TilemapObject("Point", pygame.Rect(o["x"],o["y"],0,0), o["type"], o["id"]))
+
+                    elif "ellipse" in o.keys():
+                        logging.info("Ellipse überlesen...")
+                        continue
+
+                    elif "polygon" in o.keys():
+                        logging.info("Polygon überlesen...")
+                        continue
+                    elif "text" in o.keys():
+                        logging.info("Text überlesen")
+                        continue
+                    else:
+                        self.object_layers.append(TilemapObject("Rect", pygame.Rect(o["x"],o["y"],o["width"],o["height"]), o["type"], o["id"]))
+                        logging.info("Polygon überlesen...")
+
+
+
         logging.info(f"Tilemap.load: Tilemap width={self.width} height={self.height}")
         logging.info(f"Tilemap.load: Tilemap {filepath} loaded successfully.")
 
@@ -267,11 +283,11 @@ class Tilemap:
         logging.error(f"TileId {tid} from map not found..")
         sys.exit()
 
-    def tick(self, game):
+    def tick(self):
         for _ in self.tilesets:
             _.tick()
 
-    def draw(self, surface, delta, camera, debug=False):
+    def draw(self, surface, delta, camera):
         first_tile_x = math.floor(camera.x / self.tilewidth)
         first_tile_y = math.floor(camera.y / self.tileheight)
         tiles2draw_hor = math.floor((camera.w / self.tilewidth)) + 2
@@ -294,12 +310,18 @@ class Tilemap:
                 if tile_y < 0 or tile_y > (self.height - 1) or tile_x < 0 or tile_x > (self.width - 1):
                     pass
                     # Grünes Gitter außerhalb der Map zeichnen (Debug)
-                    if debug:
+                    if self.game.debug:
                       pygame.draw.rect(surface, pygame.Color("green"),
                                       (int(draw_pos_x), int(draw_pos_y), self.tilewidth, self.tileheight), 1)
                 else:
                     if tile := self.mapdata[tile_y][tile_x]:
                         surface.blit(tile.surface, (int(draw_pos_x), int(draw_pos_y)))
-                if debug:
+                if self.game.debug:
                     pygame.draw.line(surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
 
+        if self.game.debug:
+            for _ in self.object_layers:
+                if _.type == "Rect":
+                    pygame.draw.rect(surface, "red", _.r.move(-camera.x,-camera.y), 1)
+                if _.type == "Point":
+                    pygame.draw.rect(surface, "blue", _.r.move(-camera.x,-camera.y), 1)
