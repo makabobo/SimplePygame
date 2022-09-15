@@ -27,11 +27,11 @@
             "scaleInEditor": 8
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj": {
-            "scale": 0.75,
-            "selectedLayer": 2,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 479.9999999999999,
-                "y": 162
+                "x": 249,
+                "y": 149.75
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj": {

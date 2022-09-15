@@ -2,9 +2,8 @@
 import pygame
 import random
 
-def randrom_color():
-
-    return pygame.Color("ff0000")
+def random_color():
+    return random.choice(palettecolors)
 
 
 def distance(p1, p2):

@@ -2,7 +2,7 @@ import pygame
 
 from pygame.font import *
 
-font = Font("assets/pixelmix.ttf", 8, bold=False, italic=False)
+font = Font("./gameengine/assets/pixelmix.ttf", 8, bold=False, italic=False)
 print_map = {}
 
 def draw_text(draw_surface, text, x, y, color="white"):

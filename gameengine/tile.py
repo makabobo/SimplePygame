@@ -6,6 +6,7 @@ import math
 import sys
 
 logging.getLogger().setLevel("INFO")
+from .util import draw_text
 
 ##################################################################
 # Tiles
@@ -155,11 +156,12 @@ class Tileset:
             _.tick()
 
 class TilemapObject:
-    def __init__(self, type, rect, subtype, id):
+    def __init__(self, type, rect, subtype, name, id):
         self.type = type  # "Point", "Rect"
         self.r = rect
         self.subtype = subtype
         self.id = id
+        self.name = name
 
 
 class Tilemap:
@@ -232,7 +234,7 @@ class Tilemap:
             elif layer["type"] == "objectgroup":
                 for o in layer["objects"]:
                     if "point" in o.keys():
-                        self.object_layers.append(TilemapObject("Point", pygame.Rect(o["x"],o["y"],0,0), o["type"], o["id"]))
+                        self.object_layers.append(TilemapObject("Point", pygame.Rect(o["x"],o["y"],0,0), o["type"], o["name"], o["id"]))
 
                     elif "ellipse" in o.keys():
                         logging.info("Ellipse überlesen...")
@@ -245,7 +247,7 @@ class Tilemap:
                         logging.info("Text überlesen")
                         continue
                     else:
-                        self.object_layers.append(TilemapObject("Rect", pygame.Rect(o["x"],o["y"],o["width"],o["height"]), o["type"], o["id"]))
+                        self.object_layers.append(TilemapObject("Rect", pygame.Rect(o["x"],o["y"],o["width"],o["height"]), o["type"], o["name"], o["id"]))
                         logging.info("Polygon überlesen...")
 
 
@@ -323,5 +325,7 @@ class Tilemap:
             for _ in self.object_layers:
                 if _.type == "Rect":
                     pygame.draw.rect(surface, "red", _.r.move(-camera.x,-camera.y), 1)
+                    draw_text(surface,f"{_.name} : {_.type}",_.r.x-camera.x, _.r.y-camera.y-10)
                 if _.type == "Point":
                     pygame.draw.rect(surface, "blue", _.r.move(-camera.x,-camera.y), 1)
+                    draw_text(surface, f"{_.name} : {_.type}", _.r.x - camera.x, _.r.y - camera.y - 10)

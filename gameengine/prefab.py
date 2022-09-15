@@ -15,7 +15,7 @@ class SimplePopup(Actor):
         self.pos = pos
         self.restlife = 5 * 40
 
-    def tick(self, game):
+    def tick(self):
         self.restlife -= 1
         if self.restlife == 0:
             self.dirty = True

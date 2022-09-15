@@ -1,13 +1,17 @@
-import gameengine as g
-from pygame import *
 
-class MyActor(g.Actor):
-    def draw(self, surface):
-        for l in range (0,100):
-            for hue in range(0, 360, 5):
-                c = Color("red")
-                c.hsla = (hue, 100, l, 100)
-                draw.circle(surface, c, (hue+40,10+(2*l)), 3)
 
-g.actors.append(MyActor())
-g.start()
+def make_fun(x):
+    y = 5
+    def yo():
+        #y += 1
+        return x+5+y
+    return yo
+
+f = make_fun(4)
+
+print(f())
+
+
+
+
+

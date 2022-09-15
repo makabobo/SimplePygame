@@ -102,6 +102,7 @@ class SpriteActor(Actor):
             #         if tr.colliderect(stair_tile) and tr.bottom - yd-1 <= stair_tile.top:
             #             tr.bottom = stair_tile.top
 
+            # Wenn Bewegung nach unten?
             if yd > 0:
                 for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR):
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
@@ -172,8 +173,8 @@ class SpriteActor(Actor):
 class Player(SpriteActor):
     def __init__(self, tilemap, x, y, game):
         super().__init__(x, y, 28, 40, tilemap, game)
-        self.anim_right = Animation("./assets/player.png", 24, False)
-        self.anim_left  = Animation("./assets/player.png", 24, True)
+        self.anim_right = Animation("gameengine/assets/player.png", 24, False)
+        self.anim_left  = Animation("gameengine/assets/player.png", 24, True)
 
     def tick(self):
         on_floor = self.on_floor()  # wird mehrmals benötigt
