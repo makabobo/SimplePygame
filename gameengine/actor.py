@@ -4,6 +4,7 @@ from .animation import Animation
 from .util import test_rect_lying_on_rect
 
 
+
 class Actor:
 
     def __init__(self, game):
@@ -15,6 +16,20 @@ class Actor:
 
     def draw(self, surface, delta, camera=None):
         pass
+
+
+
+class Sprite(Actor):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def set_texture(self, surface):
+        self.texture = surface
+
+
+
+
+
 
 class SpriteActor(Actor):
     def __init__(self, x, y, w, h, tilemap, game):

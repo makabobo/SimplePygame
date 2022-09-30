@@ -18,6 +18,7 @@ class Game:
         self.camera = Camera(self)
 
         self.screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
+#        self.screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
         self.__clock = pygame.time.Clock()
 

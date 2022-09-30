@@ -1,17 +1,19 @@
+class A:
+
+    def __init__(self):
+        self.x = 5
+
+    def __get__(self, instance, owner):
+        return self.x
 
 
-def make_fun(x):
-    y = 5
-    def yo():
-        #y += 1
-        return x+5+y
-    return yo
+class B:
+    def __init__(self):
+        self.y = 6
 
-f = make_fun(4)
-
-print(f())
+    a = A()
 
 
-
-
+b = B()
+print(b.a)
 

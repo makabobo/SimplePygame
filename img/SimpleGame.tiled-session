@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
+    "activeFile": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
     "expandedProjectPaths": [
         "."
     ],
@@ -30,8 +30,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 249,
-                "y": 149.75
+                "x": 479.75,
+                "y": 159.75
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj": {
@@ -79,8 +79,8 @@
     "project": "SimpleGame.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
         "Test-Tileset.json",

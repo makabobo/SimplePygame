@@ -1,6 +1,7 @@
 import pygame
 
 from pygame.font import *
+import random
 
 font = Font("./gameengine/assets/pixelmix.ttf", 8, bold=False, italic=False)
 print_map = {}
@@ -25,3 +26,33 @@ def test_rect_lying_on_rect(r1:pygame.Rect, r2:pygame.Rect) -> bool:
     return r1.y+r1.h == r2.y and not (r1.x+r1.w <= r2.x or r2.x+r2.w <= r1.x)
 
 
+def random_color():
+    return random.choice(palettecolors)
+
+
+def distance(p1, p2):
+    pass
+
+def random_direction():
+    pass
+
+def random_speed():
+    pass
+
+def color_gradient(start, end):
+    pass
+
+def rainbow():
+    retval = []
+    for hue in range(0,360,10):
+        c = pygame.Color("black")
+        c.hsla = (hue,100,100,100)
+        retval.append(c)
+
+    return retval
+
+
+palettecolors = ["black", "darkblue", "darkred", "darkgreen",
+               "brown", "darkgrey", "lightgrey", "white",
+               "red", "orange", "yellow", "green",
+               "blue", "grey", "pink", "lightpink"]
