@@ -20,7 +20,7 @@ class Menu(Actor):
         # Animator for ">" Char (Moving left/right)
         self.arrow_animator = get_anim_iterator([0,0,0,0,0,0,0,0,1,2,3,4,4,4,4,3,2,1], 2)
 
-    def tick(self):
+    def update(self):
         # Clicked
         if self.game.controller.a == 1:
             # sound_select2.play()
@@ -38,7 +38,7 @@ class Menu(Actor):
         if self.pos == -1:
             self.pos = len(self.items) - 1
 
-    def draw(self, surface, delta, camera=None):
+    def draw(self, surface, camera=None):
         x = 160
         y = 110
         yd = 15

@@ -30,7 +30,7 @@ class A(Actor):
         self.x = 10
         self.walk = walk()
 
-    def tick(self):
+    def update(self):
         self.x += next(self.walk)
         if self.x > 140:
             self.x = 10

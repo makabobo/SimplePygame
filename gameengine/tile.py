@@ -32,7 +32,7 @@ class Tile:
     def has_flags(self, flags):
         return self.flags & flags
 
-    def tick(self):
+    def update(self):
         if self.frame_delay > 0:
             self.frame_delay -= 1
             return
@@ -151,17 +151,18 @@ class Tileset:
         else:
             return None
 
-    def tick(self):
+    def update(self):
         for _ in self.ids_anim:
-            _.tick()
+            _.update()
 
 class TilemapObject:
     def __init__(self, type, rect, subtype, name, id):
-        self.type = type  # "Point", "Rect"
+        self.type = type  # "Point" oder "Rect"
         self.r = rect
         self.subtype = subtype
         self.id = id
         self.name = name
+
 
 
 class Tilemap:
@@ -248,12 +249,15 @@ class Tilemap:
                         continue
                     else:
                         self.object_layers.append(TilemapObject("Rect", pygame.Rect(o["x"],o["y"],o["width"],o["height"]), o["type"], o["name"], o["id"]))
-                        logging.info("Polygon überlesen...")
+                        #logging.info("Polygon überlesen...")
 
 
 
         logging.info(f"Tilemap.load: Tilemap width={self.width} height={self.height}")
         logging.info(f"Tilemap.load: Tilemap {filepath} loaded successfully.")
+
+    def get_objects(self, subtype:str):
+        return [r for r in self.object_layers if r.subtype == subtype]
 
     def get(self, celx, cely):
         return int(math.floor(celx / self.tilewidth)), int(math.floor(cely / self.tileheight))
@@ -285,11 +289,11 @@ class Tilemap:
         logging.error(f"TileId {tid} from map not found..")
         sys.exit()
 
-    def tick(self):
+    def update(self):
         for _ in self.tilesets:
-            _.tick()
+            _.update()
 
-    def draw(self, surface, delta, camera):
+    def draw(self, surface, camera):
         first_tile_x = math.floor(camera.x / self.tilewidth)
         first_tile_y = math.floor(camera.y / self.tileheight)
         tiles2draw_hor = math.floor((camera.w / self.tilewidth)) + 2
@@ -321,11 +325,11 @@ class Tilemap:
                 if self.game.debug:
                     pygame.draw.line(surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
 
-        if self.game.debug:
-            for _ in self.object_layers:
-                if _.type == "Rect":
-                    pygame.draw.rect(surface, "red", _.r.move(-camera.x,-camera.y), 1)
-                    draw_text(surface,f"{_.name} : {_.type}",_.r.x-camera.x, _.r.y-camera.y-10)
-                if _.type == "Point":
-                    pygame.draw.rect(surface, "blue", _.r.move(-camera.x,-camera.y), 1)
-                    draw_text(surface, f"{_.name} : {_.type}", _.r.x - camera.x, _.r.y - camera.y - 10)
+        # if self.game.debug:
+        #     for _ in self.object_layers:
+        #         if _.type == "Rect":
+        #             pygame.draw.rect(surface, "red", _.r.move(-camera.x,-camera.y), 1)
+        #             draw_text(surface,f"{_.name} : {_.type} : {_.subtype}",_.r.x-camera.x, _.r.y-camera.y-10)
+        #         if _.type == "Point":
+        #             pygame.draw.rect(surface, "blue", _.r.move(-camera.x,-camera.y), 1)
+        #             draw_text(surface,f"{_.name} : {_.type} : {_.subtype}",_.r.x - camera.x, _.r.y - camera.y - 10)

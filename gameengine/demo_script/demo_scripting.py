@@ -21,25 +21,25 @@ class Timer:
     def wait(self):
         pass
 
-    def tick(self):
+    def update(self):
 
         while self.flist:
 
             # Nächster Eintrag mit -1 (Direkt-Ausführung mit 0 Ticks)
-            if self.flist[0].__frames == -1:
+            if self.flist[0].frames == -1:
                 self.flist[0].func()
                 del self.flist[0]
                 continue
 
             # Nächster Eintrag vollständig ausgeführt?
-            if self.flist[0].__frames == 0:
+            if self.flist[0].frames == 0:
                 del self.flist[0]
                 continue
 
             # Nächster Step mit frames >= 1
-            if self.flist[0].__frames >= 1:
+            if self.flist[0].frames >= 1:
                 self.flist[0].func()
-                self.flist[0].__frames -= 1
+                self.flist[0].frames -= 1
                 return
 
 class ShortMessageTop(Actor):
@@ -62,10 +62,10 @@ class ShortMessageTop(Actor):
     def down(self):
         self.y += 1
 
-    def tick(self):
-        self.script.tick()
+    def update(self):
+        self.script.update()
 
-    def draw(self, surface, delta, camera=None):
+    def draw(self, surface, camera=None):
         draw_text(surface, self.msg, 220, self.y, "red")
 
 p = ShortMessageTop(game, "10 Punkte")

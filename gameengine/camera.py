@@ -23,7 +23,7 @@ class Camera(Actor):
     def get_screen_pos(self, pos):
         return pos[0]-self.x, pos[1]-self.y
 
-    def tick(self):
+    def update(self):
         if self.follow_obj:
             # follow_obj zu weit links?
             if self.follow_obj.r.centerx - self.x < self.border_width:

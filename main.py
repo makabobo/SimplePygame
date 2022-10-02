@@ -30,16 +30,16 @@ while 1:
 
 
     # Tick ###########
-    controller.tick()
+    controller.update()
     if menu:
         menu.tick()
     else:
-        map.tick()
+        map.update()
         for _ in old_base.moving_platforms + moving_blocks + triggers:
-            _.tick()
-        old_base.player.tick(delta)
-        camera.tick()
-        vp.tick(delta)
+            _.update()
+        old_base.player.update(delta)
+        camera.update()
+        vp.update(delta)
 
     # Draw ###########
     draw_surface.fill(map.backgroundcolor)

@@ -409,7 +409,7 @@ class Tileset:
 
     def tick(self):
         for _ in self.ids_anim:
-            _.tick()
+            _.update()
 
 
 class Tilemap:
@@ -526,7 +526,7 @@ class Tilemap:
 
     def tick(self):
         for _ in self.tilesets:
-            _.tick()
+            _.update()
 
     def draw(self):
         first_tile_x = math.floor(camera.x / self.tilewidth)

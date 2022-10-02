@@ -68,7 +68,7 @@ class MySprite(Sprite):
         self.fader = fade_func(50,255,1)
         self.animator = get_anim_iterator([0,1,2,1],10)
 
-    def tick(self):
+    def update(self):
         self.alpha = next(self.fader)
         self.frame_no = next(self.animator)
 

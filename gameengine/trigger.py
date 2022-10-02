@@ -8,7 +8,7 @@ class TriggerRect(Actor):
         self.name = name
         self.r = pygame.Rect(x, y, w, h)
 
-    def tick(self):
+    def update(self):
         pass
 
     def draw(self):

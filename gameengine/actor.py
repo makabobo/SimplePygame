@@ -55,10 +55,10 @@ class Actor:
         self.dirty = False
         self.game = game
 
-    def tick(self):
+    def update(self):
         pass
 
-    def draw(self, surface, delta, camera=None):
+    def draw(self, surface, camera=None):
         pass
 
 
@@ -171,7 +171,7 @@ class PhysicsBody(Actor):
                 return True
         return False
 
-    def tick(self):
+    def update(self):
         # Schwerkraft simulieren
         if not self.check_on_floor() and not self.check_on_stair():
             self.ys += self.ya
@@ -187,69 +187,3 @@ class PhysicsBody(Actor):
         pass
 
 
-class Player(PhysicsBody):
-    def __init__(self, x, y, game):
-        super().__init__(x, y, 12, 34, game)
-        self.playersprite = Sprite("gameengine/assets/player.png", 6)
-
-        self.walk_anim = get_anim_iterator([0,1,2,1],10)
-        self.stand_anim = get_anim_iterator([3,4],20)
-        self.jump_anim = get_anim_iterator([5],60)
-
-        self.current_anim = self.stand_anim
-
-        self.on_floor = self.check_on_floor()
-        self.on_stair = self.check_on_stair()
-
-    def check_status(self):
-        self.on_floor = self.check_on_floor()
-        self.on_stair = self.check_on_stair()
-
-    def tick(self):
-        self.check_status()
-
-        if self.game.controller.left:
-            self.xs = -2
-        elif self.game.controller.right:
-            self.xs = 2
-        else:
-            self.xs = 0
-        # Springen von Boden oder Treppe
-        if self.game.controller.a == 1 and not self.game.controller.down and (self.on_stair or self.on_floor):
-            self.ys = -6.7
-
-        # Von Treppe fallen lassen
-        if self.game.controller.a == 1 and self.game.controller.down and self.on_stair:
-            self.r.y += 1
-
-        # Auf dem Boden/Treppe ist Beschleunigung nach unten = 0.0
-        if self.game.controller.a == 0 and (self.on_stair or self.on_floor):
-            self.ys = 0.0
-        super().tick()
-
-    def draw(self, surface, delta, camera=None):
-        if self.game.debug:
-            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
-
-        self.game.debug_msg = f"ys={self.ys:0.5f}" #, pos={self.x},{self.y}"
-
-        if self.ys != 0.0:
-            self.current_anim = self.jump_anim
-        else:
-            if self.xs > 0.0:
-                self.current_anim = self.walk_anim
-                self.playersprite.flip = False
-            elif self.xs < 0.0:
-                self.current_anim = self.walk_anim
-                self.playersprite.flip = True
-            else:
-                self.current_anim = self.stand_anim
-
-        self.playersprite.frame_no = next(self.current_anim)
-
-        rect = pygame.Rect(0,0, self.playersprite.width, self.playersprite.height)
-        rect.midbottom = self.r.midbottom
-        rect.move_ip(-camera.x, -camera.y)
-        if self.game.debug:
-            pygame.draw.rect(surface, "yellow", rect, 1)
-        self.playersprite.draw(surface, rect)
