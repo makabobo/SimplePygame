@@ -1,8 +1,52 @@
 import pygame
 from .tile import Tile
 from .animation import Animation
-from .util import test_rect_lying_on_rect
+from .util import *
+from pygame import Vector2
 
+
+class Sprite:
+    """
+    Sprite, das aus mehreren Frames bestehen kann.
+    Eigenschaften:
+      - texture  = Ursprungsbild mit verschiedenen Frames
+      - frame_no = Aktuelles Frame
+      - flip     = Horizontal gespiegelt anzeigen?
+      - alpha    = Alpha-Wert 0-255 (0=durchsichtig 255=100%Deckung)
+    """
+    def __init__(self, img_path:str, framecount:int = 1):
+        self.texture = None
+        self.frame_no = 0
+        self.flip = False
+        self.alpha = 255
+        self.width = 0
+        self.height = 0
+
+        self.__frames = []
+        self.__frames_flipped = []
+        self.texture = pygame.image.load(img_path)
+        if framecount <= 1:
+            self.__frames.append(self.texture)
+        else:
+            if self.texture.get_width() % framecount != 0:
+                print("Fehler bei Texture-Verarbeitung..")
+                exit()
+            self.width = self.texture.get_width() / framecount
+            self.height = self.texture.get_height()
+            for i in range(framecount):
+                frame = pygame.Surface((self.width, self.texture.get_height()), pygame.SRCALPHA)
+                frame.blit(self.texture, (0, 0), pygame.Rect(i * self.width, 0, self.width, self.texture.get_height()))
+                self.__frames.append(frame)
+                frame_flipped = pygame.transform.flip(frame, True, False)
+                self.__frames_flipped.append(frame_flipped)
+
+    def draw(self, surface, pos):
+        if not self.flip:
+            self.__frames[self.frame_no].set_alpha(self.alpha)
+            surface.blit(self.__frames[self.frame_no], pos)
+        else:
+            self.__frames_flipped[self.frame_no].set_alpha(self.alpha)
+            surface.blit(self.__frames_flipped[self.frame_no], pos)
 
 
 class Actor:
@@ -18,53 +62,14 @@ class Actor:
         pass
 
 
-
-class Sprite(Actor):
-    def __init__(self, game):
-        super().__init__(game)
-
-    def set_texture(self, surface):
-        self.texture = surface
-
-
-
-
-
-
-class SpriteActor(Actor):
-    def __init__(self, x, y, w, h, tilemap, game):
+class PhysicsBody(Actor):
+    def __init__(self, x, y, w, h, game):
         super().__init__(game)
         self.r = pygame.Rect(x, y, w, h)
-        self.tilemap = tilemap
         self.xa = 0.0  # Acceleration
         self.ya = 0.4
         self.xs = 0.0  # speed
         self.ys = 0.0
-
-    @property
-    def x(self):
-        return self.r.x
-
-    @property
-    def y(self):
-        return self.r.y
-
-    @property
-    def w(self):
-        return self.r.w
-
-    @property
-    def h(self):
-        return self.r.h
-
-    @property
-    def centerx(self):
-        return self.r.centerx
-
-    @property
-    def centery(self):
-        return self.r.centery
-
 
     def move_soft(self, xd, yd, ignore_stairs=False):
         blocked = False
@@ -86,8 +91,8 @@ class SpriteActor(Actor):
         if xd != 0 or yd != 0:
 
             collision_rects = []
-            if self.tilemap:
-                collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
+            if self.game.map:
+                collision_rects = self.game.map.get_collision_tiles(tr, Tile.WALL)
             #collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
             for collider in collision_rects:
@@ -113,13 +118,13 @@ class SpriteActor(Actor):
 
             # Variante mit beweglichen Platformen
             # if yd > 0:
-            #     for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
+            #     for stair_tile in self.map.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
             #         if tr.colliderect(stair_tile) and tr.bottom - yd-1 <= stair_tile.top:
             #             tr.bottom = stair_tile.top
 
             # Wenn Bewegung nach unten?
             if yd > 0:
-                for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR):
+                for stair_tile in self.game.map.get_collision_tiles(tr, Tile.STAIR):
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
         self.r = tr
@@ -144,21 +149,21 @@ class SpriteActor(Actor):
     #             pe.move2(xd, yd)
     #     self.r = rect_dest
 
-    def on_floor(self):
+    def check_on_floor(self):
         """ detects ground """
         # "Bodenplatte des Players berechnen
         rg = self.r.move(0,1)
-        collision_rects = self.tilemap.get_collision_tiles(rg, Tile.WALL)
+        collision_rects = self.game.map.get_collision_tiles(rg, Tile.WALL)
         # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for cr in collision_rects:
             if test_rect_lying_on_rect(self.r, cr):
                 return True
         return False
 
-    def on_stair(self):
+    def check_on_stair(self):
         """ detects ground """
         rg = self.r.move(0,1)
-        collision_rects = self.tilemap.get_collision_tiles(rg, Tile.STAIR)
+        collision_rects = self.game.map.get_collision_tiles(rg, Tile.STAIR)
         # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         # collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for cr in collision_rects:
@@ -168,15 +173,12 @@ class SpriteActor(Actor):
 
     def tick(self):
         # Schwerkraft simulieren
-        if not self.on_floor():
+        if not self.check_on_floor() and not self.check_on_stair():
             self.ys += self.ya
         if self.ys > 7.0:
             self.ys = 7.0
 
-        self.move_soft(self.xs, self.ys)
-
-    def draw(self):
-        pass
+        self.move_soft(int(self.xs), int(self.ys))
 
     def collides_with(self, other) -> bool:
         return self.r.colliderect(other.r)
@@ -185,17 +187,26 @@ class SpriteActor(Actor):
         pass
 
 
-class Player(SpriteActor):
-    def __init__(self, tilemap, x, y, game):
-        super().__init__(x, y, 28, 40, tilemap, game)
-        self.anim_right = Animation("gameengine/assets/player.png", 24, False)
-        self.anim_left  = Animation("gameengine/assets/player.png", 24, True)
+class Player(PhysicsBody):
+    def __init__(self, x, y, game):
+        super().__init__(x, y, 12, 34, game)
+        self.playersprite = Sprite("gameengine/assets/player.png", 6)
+
+        self.walk_anim = get_anim_iterator([0,1,2,1],10)
+        self.stand_anim = get_anim_iterator([3,4],20)
+        self.jump_anim = get_anim_iterator([5],60)
+
+        self.current_anim = self.stand_anim
+
+        self.on_floor = self.check_on_floor()
+        self.on_stair = self.check_on_stair()
+
+    def check_status(self):
+        self.on_floor = self.check_on_floor()
+        self.on_stair = self.check_on_stair()
 
     def tick(self):
-        on_floor = self.on_floor()  # wird mehrmals benötigt
-        on_stair = self.on_stair()  # wird mehrmals benötigt
-
-        self.game.debug_msg = f"on-floor={on_floor}" #, pos={self.x},{self.y}"
+        self.check_status()
 
         if self.game.controller.left:
             self.xs = -2
@@ -203,22 +214,42 @@ class Player(SpriteActor):
             self.xs = 2
         else:
             self.xs = 0
-        # Springen
-        if self.game.controller.a == 1 and not self.game.controller.down and (on_stair or on_floor):
+        # Springen von Boden oder Treppe
+        if self.game.controller.a == 1 and not self.game.controller.down and (self.on_stair or self.on_floor):
             self.ys = -6.7
 
-
         # Von Treppe fallen lassen
-        if self.game.controller.a == 1 and self.game.controller.down and on_stair:
+        if self.game.controller.a == 1 and self.game.controller.down and self.on_stair:
             self.r.y += 1
 
-        if self.game.controller.a == 0 and (on_stair or on_floor) and self.ys >= 0:
+        # Auf dem Boden/Treppe ist Beschleunigung nach unten = 0.0
+        if self.game.controller.a == 0 and (self.on_stair or self.on_floor):
             self.ys = 0.0
         super().tick()
 
     def draw(self, surface, delta, camera=None):
-        #pygame.draw.rect(draw_surface, "red", self.r.move(-camera.x, -camera.y), 1, 7)
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
 
-        self.anim_left.draw(surface, self.r.move(-camera.x, -camera.y-10), delta)
+        self.game.debug_msg = f"ys={self.ys:0.5f}" #, pos={self.x},{self.y}"
+
+        if self.ys != 0.0:
+            self.current_anim = self.jump_anim
+        else:
+            if self.xs > 0.0:
+                self.current_anim = self.walk_anim
+                self.playersprite.flip = False
+            elif self.xs < 0.0:
+                self.current_anim = self.walk_anim
+                self.playersprite.flip = True
+            else:
+                self.current_anim = self.stand_anim
+
+        self.playersprite.frame_no = next(self.current_anim)
+
+        rect = pygame.Rect(0,0, self.playersprite.width, self.playersprite.height)
+        rect.midbottom = self.r.midbottom
+        rect.move_ip(-camera.x, -camera.y)
+        if self.game.debug:
+            pygame.draw.rect(surface, "yellow", rect, 1)
+        self.playersprite.draw(surface, rect)

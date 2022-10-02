@@ -20,6 +20,9 @@ class Camera(Actor):
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.w, self.h)
 
+    def get_screen_pos(self, pos):
+        return pos[0]-self.x, pos[1]-self.y
+
     def tick(self):
         if self.follow_obj:
             # follow_obj zu weit links?

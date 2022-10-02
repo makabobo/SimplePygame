@@ -26,20 +26,20 @@ class Timer:
         while self.flist:
 
             # Nächster Eintrag mit -1 (Direkt-Ausführung mit 0 Ticks)
-            if self.flist[0].frames == -1:
+            if self.flist[0].__frames == -1:
                 self.flist[0].func()
                 del self.flist[0]
                 continue
 
             # Nächster Eintrag vollständig ausgeführt?
-            if self.flist[0].frames == 0:
+            if self.flist[0].__frames == 0:
                 del self.flist[0]
                 continue
 
             # Nächster Step mit frames >= 1
-            if self.flist[0].frames >= 1:
+            if self.flist[0].__frames >= 1:
                 self.flist[0].func()
-                self.flist[0].frames -= 1
+                self.flist[0].__frames -= 1
                 return
 
 class ShortMessageTop(Actor):

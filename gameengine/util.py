@@ -29,18 +29,11 @@ def test_rect_lying_on_rect(r1:pygame.Rect, r2:pygame.Rect) -> bool:
 def random_color():
     return random.choice(palettecolors)
 
-
-def distance(p1, p2):
-    pass
-
-def random_direction():
-    pass
-
-def random_speed():
-    pass
-
-def color_gradient(start, end):
-    pass
+def get_anim_iterator(array, duration):
+    while 1:
+        for element in array:
+            for x in range(duration):
+                yield element
 
 def rainbow():
     retval = []

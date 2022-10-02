@@ -1,9 +1,8 @@
+import pygame
 from .menu import *
 from .input import *
 from .tile import *
-from .prefab import SimplePopup
-import pygame
-from .actor import Player
+from .prefab import *
 from .camera import Camera
 
 
@@ -21,6 +20,7 @@ class Game:
 #        self.screen = pygame.display.set_mode((480, 256), pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
         self.__clock = pygame.time.Clock()
+        self.update_times = 120*[0]
 
     def load_map(self, path):
         self.map = Tilemap(self)
@@ -30,6 +30,7 @@ class Game:
         delta = 0.0
 
         while 1:
+            time_before_update = pygame.time.get_ticks()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
@@ -39,7 +40,7 @@ class Game:
                     else:
                         self.menu = None
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.actors.append(SimplePopup(event.pos))
+                    self.actors.append(SimplePopup(self,event.pos))
 
             #########
             # TICK
@@ -81,8 +82,15 @@ class Game:
                 pygame.draw.rect(self.draw_surface, "black", (0,0,200,30), 0)
                 draw_text(self.draw_surface, self.debug_msg, 10, 10, "white")
 
+            del self.update_times[0]
+            self.update_times.append((pygame.time.get_ticks()-time_before_update))
+            if self.debug:
+                draw_frame_times(self.draw_surface, (350,20), self.update_times)
+
             self.screen.blit(self.draw_surface, (0, 0))
             pygame.display.flip()
+
+
             delta = self.__clock.tick(60)
 
 
