@@ -3,7 +3,7 @@ import sys
 from gameengine import *
 from gameengine.prefab import *
 
-game.load_map("gameengine/assets/test-map.tmj")
+game.load_map("gameengine/assets/map_crater1.tmj")
 game.triggers = []
 
 def update():
