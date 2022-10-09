@@ -52,6 +52,7 @@ class ShortMessageTop(Actor):
         self.script.add_step(self.down, frames=60)
         self.script.add_step(self.wait, frames=30)
         self.script.add_step(self.up,  frames=60)
+        self.script.add_step(self.end, frames=0)
 
     def wait(self):
         pass
@@ -61,6 +62,10 @@ class ShortMessageTop(Actor):
 
     def down(self):
         self.y += 1
+
+    def end(self):
+        print("Dirty...")
+        self.dirty = True
 
     def update(self):
         self.script.update()

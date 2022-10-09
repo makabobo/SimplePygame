@@ -11,8 +11,6 @@ class Menu(Actor):
         self.pos = 0
         self.items = []
         self.selection_bar = Sprite("./gameengine/assets/menu_selection_bar1.png")
-        self.background_top = Sprite("./gameengine/assets/menu_top.png")
-        self.background_bottom = Sprite("./gameengine/assets/menu_bottom.png")
 
         # Animator for the Selection-Bar (Fade in/out)
         self.fader = get_anim_iterator([30,80,130,180,230,255,230,180,130,80],6)
@@ -45,10 +43,8 @@ class Menu(Actor):
 
         self.selection_bar.alpha = next(self.fader)
 
-        pygame.draw.rect(surface, "black",    pygame.Rect(140, 80, 200, 100), 0)
-        self.background_top.draw(surface, (142,80))
-        self.background_bottom.draw(surface, (142,160))
-        pygame.draw.rect(surface, "black", pygame.Rect(140, 80, 200, 100), 2)
+        pygame.draw.rect(surface, "black",    pygame.Rect(140, 80, 200, 130), 0)
+        pygame.draw.rect(surface, "brown", pygame.Rect(140, 80, 200, 130), 2)
 
         draw_text(surface, self.name, x + 44, 80 + 5, "darkgray")
 
@@ -62,8 +58,8 @@ class Menu(Actor):
                 draw_text(surface, item[1], x + 140, y, "white")
             else:
                 # Nicht ausgewählte Menüpunkte
-                draw_text(surface, item[0], x + 10, y, "red")
-                draw_text(surface, item[1], x + 140, y, "red")
+                draw_text(surface, item[0], x + 10, y, "lightgray")
+                draw_text(surface, item[1], x + 140, y, "lightgray")
             y += yd
             num += 1
 
@@ -73,18 +69,25 @@ class Menu(Actor):
 class MainMenu(Menu):
     def __init__(self, game):
         super().__init__("MAIN MENU", game)
-        self.items = [["TOGGLE FULLSCREEN", ""], ["DEBUG", "OFF"], ["EXIT", ""]]
+        self.items = [["TOGGLE FULLSCREEN", ""], ["DISPLAY SCALED MODE","OFF"], ["DEBUG", "OFF"], ["EXIT", ""]]
 
     def clicked(self, item):
         if item[0] == "TOGGLE FULLSCREEN":
             pygame.display.toggle_fullscreen()
+        if item[0] == "DISPLAY SCALED MODE":
+            if self.game.scaled_display:
+                self.game.set_scaled_display(False)
+                self.items[1][1] = "OFF"
+            else:
+                self.game.set_scaled_display(True)
+                self.items[1][1] = "ON"
         if item[0] == "DEBUG":
             if self.game.debug:
                 self.game.debug = False
-                self.items[1][1] = "OFF"
+                self.items[2][1] = "OFF"
             else:
                 self.game.debug = True
-                self.items[1][1] = "ON"
+                self.items[2][1] = "ON"
         if item[0] == "EXIT":
             sys.exit()
 

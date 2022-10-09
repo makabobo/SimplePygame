@@ -1,25 +1,24 @@
-import pygame.gfxdraw
-from .actor import *
+import gameengine.util
+from gameengine import *
+import pygame
 
-class Camera(Actor, pygame.Rect):
-    BORDER_WIDTH = 340
-    BORDER_HEIGHT = 200
+
+
+class MyCamera(Actor, pygame.Rect):
+    BORDER_WIDTH = 40
+    BORDER_HEIGHT = 15
 
     def __init__(self, game):
         super().__init__(game)
-        self.x = 0
-        self.y = 0
-        self.w = 480
-        self.h = 256
+        self.x = 100
+        self.y = 200
+        self.w = 80
+        self.h = 48
         self.inner_cam = self.inflate(-self.BORDER_WIDTH, -self.BORDER_HEIGHT)
 
         # TODO: Überprüfung, ob Korridore disjunkt sein
-        self.corridors = [pygame.Rect(0,48,960,256),
-                          pygame.Rect(480,304,480,384),
-                          pygame.Rect(960, 560, 480, 256),
-                          pygame.Rect(480,688,480,256),
-                          pygame.Rect(0, 304, 480, 640)
-                          ]
+        self.corridors = [pygame.Rect(100,20,300,78),
+                          pygame.Rect(320,98,80,110)]
         self.cur_corridor = self.corridors[0]
         self.follow_obj = None
 
@@ -57,3 +56,30 @@ class Camera(Actor, pygame.Rect):
         if in_corridor:
             self.cur_corridor = in_corridor[0]
         self.clamp_ip(self.cur_corridor)
+
+    def draw(self, surface, camera=None):
+        pygame.draw.rect(surface, "red", self.corridors[0], 1)
+        pygame.draw.rect(surface, "white", self.corridors[1], 1)
+        pygame.draw.rect(surface, "blue", self, 1)
+        pygame.draw.rect(surface, "green", self.inner_cam, 1)
+
+
+####################################################################################
+class PlayerDummy(Actor):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def update(self):
+        self.r = pygame.Rect(pygame.mouse.get_pos(), (5,5))
+
+    def draw(self, surface, camera=None):
+        pygame.draw.rect(surface, "orange", self.r, 1)
+
+g = Game()
+cam = MyCamera(g)
+p = PlayerDummy(g)
+cam.follow(p)
+g.camera.follow(p)
+g.actors.append(p)
+g.actors.append(cam)
+g.start()

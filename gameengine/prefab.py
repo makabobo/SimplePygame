@@ -98,7 +98,7 @@ class Player(PhysicsBody):
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
 
-        self.game.debug_msg = f"ys={self.ys:0.5f}" #, pos={self.x},{self.y}"
+        #self.game.debug_msg = f"ys={self.ys:0.5f}" #, pos={self.x},{self.y}"
 
         if self.is_dead:
             self.current_anim = self.die_anim

@@ -3,6 +3,9 @@ import pygame
 from pygame.font import *
 import random
 
+
+#font = Font("./gameengine/assets/m3x6.ttf", 15, bold=False, italic=False)
+#font = Font("./gameengine/assets/m5x7.ttf", 15, bold=False, italic=False)
 font = Font("./gameengine/assets/pixelmix.ttf", 8, bold=False, italic=False)
 print_map = {}
 
@@ -35,6 +38,13 @@ def get_anim_iterator(array, duration):
             for x in range(duration):
                 yield element
 
+def delimit(x, begin, end):
+    if x < begin:
+        return begin
+    elif x > end:
+        return end
+    else:
+        return x
 def rainbow():
     retval = []
     for hue in range(0,360,10):
