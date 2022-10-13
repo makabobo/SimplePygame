@@ -135,3 +135,16 @@ class TriggerRect(Actor):
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
 
 
+class MoonEnemy(Actor):
+    def __init__(self, game, rect):
+        super().__init__(game)
+        self.r = rect
+        self.anim = get_anim_iterator([0,0,0,1,2,2,2,1,],7)
+        self.sprite = Sprite("gameengine/assets/spritesheet_enemy2.png", 6)
+
+    def draw(self, surface, camera=None):
+        self.sprite.draw(surface, self.r.move(-camera.x,-camera.y+next(self.anim)))
+        if self.game.debug:
+            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+
+

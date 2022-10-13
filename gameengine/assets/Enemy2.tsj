@@ -1,0 +1,14 @@
+{ "columns":6,
+ "image":"Enemy2.png",
+ "imageheight":48,
+ "imagewidth":288,
+ "margin":0,
+ "name":"Enemy2",
+ "spacing":0,
+ "tilecount":6,
+ "tiledversion":"1.8.4",
+ "tileheight":48,
+ "tilewidth":48,
+ "type":"tileset",
+ "version":"1.8"
+}

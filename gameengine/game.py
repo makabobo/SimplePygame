@@ -41,6 +41,7 @@ class Game:
 
     def start(self):
         time_before_update = 0
+
         while 1:
 
             for event in pygame.event.get():
@@ -97,7 +98,7 @@ class Game:
 
                 draw_frame_times(self.draw_surface, self.update_times)
 
-                self.debug_msg = f"Anzahl Actors = {len(self.actors)}"
+                #self.debug_msg = f"Anzahl Actors = {len(self.actors)}"
 
 
             draw_text(self.draw_surface, f"Maus={self.camera.to_map_pos(pygame.mouse.get_pos())}", 10,20)

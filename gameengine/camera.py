@@ -3,7 +3,7 @@ from .actor import *
 
 class Camera(Actor, pygame.Rect):
     BORDER_WIDTH = 340
-    BORDER_HEIGHT = 200
+    BORDER_HEIGHT = 150
 
     def __init__(self, game):
         super().__init__(game)
@@ -14,14 +14,12 @@ class Camera(Actor, pygame.Rect):
         self.inner_cam = self.inflate(-self.BORDER_WIDTH, -self.BORDER_HEIGHT)
 
         # TODO: Überprüfung, ob Korridore disjunkt sein
-        self.corridors = [pygame.Rect(0,48,960,256),
-                          pygame.Rect(480,304,480,384),
-                          pygame.Rect(960, 560, 480, 256),
-                          pygame.Rect(480,688,480,256),
-                          pygame.Rect(0, 304, 480, 640)
-                          ]
-        self.cur_corridor = self.corridors[0]
+        self.corridors = []
+        self.cur_corridor = None
         self.follow_obj = None
+
+    def add_corridor(self, corridor:pygame.Rect):
+        self.corridors.append(corridor)
 
     def follow(self, fobj):
         self.follow_obj = fobj
@@ -39,6 +37,8 @@ class Camera(Actor, pygame.Rect):
         return screen_pos[0]+self.x, screen_pos[1]+self.y
 
     def update(self):
+        if not self.follow_obj:
+            return
         x, y = self.follow_obj.r.center
         if not self.inner_cam.collidepoint(x, y):
             # inner_rect so verschieben, dass x,y innerhalb ist.
@@ -55,5 +55,10 @@ class Camera(Actor, pygame.Rect):
 
         in_corridor = [x for x in self.corridors if x.collidepoint(self.follow_obj.r.center) is True]
         if in_corridor:
+            if self.cur_corridor != in_corridor[0]:
+                # Bildschirm-Wechsel-Event erzeugen
+                pass
             self.cur_corridor = in_corridor[0]
-        self.clamp_ip(self.cur_corridor)
+        if self.cur_corridor:
+            self.clamp_ip(self.cur_corridor)
+

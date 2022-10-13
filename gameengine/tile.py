@@ -155,7 +155,15 @@ class Tileset:
         for _ in self.ids_anim:
             _.update()
 
-class TilemapObject:
+class TilemapLayer:
+    def __init__(self, name):
+        self.name = name
+        self.objects = []
+
+    def append(self, obj):
+        self.objects.append(obj)
+
+class TilemapLayerObject:
     def __init__(self, type, rect, subtype, name, id):
         self.type = type  # "Point" oder "Rect"
         self.r = rect
@@ -174,7 +182,7 @@ class Tilemap:
         self.height = 0
         self.backgroundcolor = pygame.Color("black")
         self.mapdata = []
-        self.object_layers = []
+        self.object_layers = {}  # name -> TilesetLayer
         self.tilesets = []
 
         self.last_collision_rects = []
@@ -233,9 +241,12 @@ class Tilemap:
             # Object - Layer
             #
             elif layer["type"] == "objectgroup":
+                ol = TilemapLayer(name=layer["name"])
+                self.object_layers[ol.name] = ol
+                logging.info(f"New Object-Layer '{ol.name}'")
                 for o in layer["objects"]:
                     if "point" in o.keys():
-                        self.object_layers.append(TilemapObject("Point", pygame.Rect(o["x"],o["y"],0,0), o["type"], o["name"], o["id"]))
+                        ol.append(TilemapLayerObject("Point", pygame.Rect(o["x"], o["y"], 0, 0), o["type"], o["name"], o["id"]))
 
                     elif "ellipse" in o.keys():
                         logging.info("Ellipse überlesen...")
@@ -248,7 +259,7 @@ class Tilemap:
                         logging.info("Text überlesen")
                         continue
                     else:
-                        self.object_layers.append(TilemapObject("Rect", pygame.Rect(o["x"],o["y"],o["width"],o["height"]), o["type"], o["name"], o["id"]))
+                        ol.append(TilemapLayerObject("Rect", pygame.Rect(o["x"], o["y"], o["width"], o["height"]), o["type"], o["name"], o["id"]))
                         #logging.info("Polygon überlesen...")
 
 
@@ -256,8 +267,13 @@ class Tilemap:
         logging.info(f"Tilemap.load: Tilemap width={self.width} height={self.height}")
         logging.info(f"Tilemap.load: Tilemap {filepath} loaded successfully.")
 
-    def get_objects(self, subtype:str):
-        return [r for r in self.object_layers if r.subtype == subtype]
+    def get_objects(self, layer:str, subtype:str=None):
+        if subtype:
+            # Wenn Subtype angegeben
+            return [r for r in self.object_layers[layer].objects if r.subtype == subtype]
+        else:
+            # Liefere alle Objekte des Layers zurück
+            return self.object_layers[layer].objects
 
     def get(self, celx, cely):
         return int(math.floor(celx / self.tilewidth)), int(math.floor(cely / self.tileheight))

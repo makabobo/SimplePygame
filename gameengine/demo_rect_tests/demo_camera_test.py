@@ -17,10 +17,12 @@ class MyCamera(Actor, pygame.Rect):
         self.inner_cam = self.inflate(-self.BORDER_WIDTH, -self.BORDER_HEIGHT)
 
         # TODO: Überprüfung, ob Korridore disjunkt sein
-        self.corridors = [pygame.Rect(100,20,300,78),
-                          pygame.Rect(320,98,80,110)]
-        self.cur_corridor = self.corridors[0]
+        self.corridors = []
+        self.cur_corridor = None
         self.follow_obj = None
+
+    def add_corridor(self, corridor:pygame.Rect):
+        self.corridors.append(corridor)
 
     def follow(self, fobj):
         self.follow_obj = fobj
@@ -54,8 +56,14 @@ class MyCamera(Actor, pygame.Rect):
 
         in_corridor = [x for x in self.corridors if x.collidepoint(self.follow_obj.r.center) is True]
         if in_corridor:
+            if self.cur_corridor != in_corridor[0]:
+                print("Bildschirm Wechsel")
+                # Bildschirm-Wechsel-Event erzeugen
+                pass
             self.cur_corridor = in_corridor[0]
-        self.clamp_ip(self.cur_corridor)
+
+        if self.cur_corridor:
+            self.clamp_ip(self.cur_corridor)
 
     def draw(self, surface, camera=None):
         pygame.draw.rect(surface, "red", self.corridors[0], 1)
@@ -77,6 +85,9 @@ class PlayerDummy(Actor):
 
 g = Game()
 cam = MyCamera(g)
+cam.add_corridor(pygame.Rect(100,20,300,78))
+cam.add_corridor(pygame.Rect(320,98,80,110))
+
 p = PlayerDummy(g)
 cam.follow(p)
 g.camera.follow(p)

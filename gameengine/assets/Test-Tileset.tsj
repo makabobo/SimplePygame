@@ -1,16 +1,24 @@
 { "columns":8,
  "image":"tileset_test.png",
- "imageheight":32,
+ "imageheight":48,
  "imagewidth":128,
  "margin":0,
  "name":"Test-Tileset",
  "spacing":0,
- "tilecount":17,
+ "tilecount":24,
  "tiledversion":"1.8.4",
  "tileheight":16,
  "tiles":[
         {
+         "id":2,
+         "type":"WALL"
+        }, 
+        {
          "id":3,
+         "type":"WALL"
+        }, 
+        {
+         "id":9,
          "type":"WALL"
         }, 
         {

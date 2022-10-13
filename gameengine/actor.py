@@ -1,6 +1,6 @@
 import pygame
 from .tile import Tile
-from .animation import Animation
+#from .animation import Animation
 from .util import *
 from pygame import Vector2
 

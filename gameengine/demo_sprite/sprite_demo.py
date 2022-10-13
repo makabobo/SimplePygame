@@ -19,7 +19,7 @@ def get_anim_iterator(array, frames):
                 yield a
 
 ############################################################
-class Sprite(Actor):
+class Sprite:
     """
     Sprite, das aus mehreren Frames bestehen kann.
     Eigenschaften:
@@ -30,7 +30,7 @@ class Sprite(Actor):
       - alpha    = Alpha-Wert 0-255 (0=durchsichtig 255=100%Deckung)
     """
     def __init__(self, g):
-        super().__init__(game)
+        #super().__init__(game)
         self.texture = None
         self.pos = Vector2(0, 0) # links oben, wird für surface.blit genutzt
         self.frame_no = None

@@ -22,8 +22,18 @@
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsx": {
             "dynamicWrapping": false
         },
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj": {
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj": {
             "scaleInDock": 1,
+            "scaleInEditor": 8
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 8
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj": {
+            "dynamicWrapping": true,
+            "scaleInDock": 0.75,
             "scaleInEditor": 8
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj": {
@@ -35,11 +45,11 @@
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj": {
-            "scale": 0.5,
-            "selectedLayer": 0,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 673,
-                "y": 579
+                "x": 595.25,
+                "y": 559.25
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj": {
@@ -98,27 +108,29 @@
     "map.tileWidth": 16,
     "map.width": 200,
     "openFiles": [
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj"
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj"
     ],
     "project": "SimpleGame.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/TheGame/level/Level 1-1.json",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
         "Test-Tileset.json",
         "test_map.json",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj",
-        "sprites_actors.json",
-        "Test-Tileset2.tsx"
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
-        "height": 16,
-        "width": 16
-    }
+        "height": 48,
+        "width": 48
+    },
+    "tileset.type": 1
 }

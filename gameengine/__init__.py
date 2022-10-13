@@ -9,7 +9,6 @@ from .camera import *
 from .input import *
 from .tile import *
 from .game import Game
-from .animation import *
 
 logging.getLogger().setLevel("INFO")
 
