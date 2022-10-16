@@ -45,9 +45,9 @@ while 1:
         counter += 1
         if counter >= 3:
             counter = 0
-            #test_img3.scroll(1,2)
-            #palette = [palette[1:16]]+[palette[0]]
-            #test_img3.set_palette(palette)
+            test_img3.scroll(1,2)
+            palette = [palette[1:16]]+[palette[0]]
+            test_img3.set_palette(palette)
 
         draw_surface.blit(test_img1, (50+x, 50), None, pygame.BLEND_ALPHA_SDL2)
         draw_surface.blit(test_img2, (50+x, 50+x))

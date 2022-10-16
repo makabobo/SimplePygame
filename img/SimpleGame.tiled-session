@@ -45,11 +45,11 @@
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj": {
-            "scale": 2,
-            "selectedLayer": 1,
+            "scale": 4,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 595.25,
-                "y": 559.25
+                "x": 549.875,
+                "y": 761.375
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj": {
@@ -109,15 +109,16 @@
     "map.width": 200,
     "openFiles": [
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj"
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj"
     ],
     "project": "SimpleGame.tiled-project",
-    "property.type": "string",
+    "property.type": "int",
     "recentFiles": [
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/TheGame/level/Level 1-1.json",

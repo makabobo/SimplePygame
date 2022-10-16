@@ -42,6 +42,30 @@ class Timer:
                 self.flist[0].frames -= 1
                 return
 
+class TimerNew:
+
+    def __init__(self):
+        self.steps = []
+        self.cur_step = 0
+
+    class TimerStep:
+        def __init__(self, func, frames):
+            self.func = func
+            self.frames = frames
+
+    def add_step(self, func, frames):
+        self.steps.append(self.TimerStep(func, frames))
+
+    def wait(self):
+        pass
+
+    def update(self):
+        if not self.steps:
+            return
+
+
+
+
 class ShortMessageTop(Actor):
 
     def __init__(self, g, msg):

@@ -27,7 +27,7 @@ def draw_frame_times(surface, frame_times):
 class SimplePopup(Actor):
     def __init__(self, game, pos):
         super().__init__(game)
-        self.mysprite = Sprite("gameengine/assets/wall_collision.png",4)
+        self.mysprite = Sprite("gameengine/assets/wall_collision_white.png",4)
         self.pos = (pos[0]-3, pos[1]-3)
 
         self.restlife = 4*5
@@ -40,8 +40,8 @@ class SimplePopup(Actor):
 
     def draw(self, surface,camera=None):
         self.mysprite.frame_no = next(self.anim)
-        self.mysprite.draw(surface, self.pos)
-
+        self.mysprite.draw(surface, (self.pos[0]-camera.x, self.pos[1]-camera.y))
+####################################################################################################
 class Player(PhysicsBody):
     def __init__(self, game):
         super().__init__(0, 0, 12, 34, game)
@@ -84,6 +84,7 @@ class Player(PhysicsBody):
         # Springen von Boden oder Treppe
         if self.game.controller.a == 1 and not self.game.controller.down and (self.on_stair or self.on_floor):
             self.ys = -6.7
+            self.game.add_actor(SimplePopup(self.game, self.r.midbottom))
 
         # Von Treppe fallen lassen
         if self.game.controller.a == 1 and self.game.controller.down and self.on_stair:
@@ -92,6 +93,7 @@ class Player(PhysicsBody):
         # Auf dem Boden/Treppe ist Beschleunigung nach unten = 0.0
         if self.game.controller.a == 0 and (self.on_stair or self.on_floor):
             self.ys = 0.0
+            #self.game.add_actor(SimplePopup(self.game, self.r.midbottom))
         super().update()
 
     def draw(self, surface, camera=None):
@@ -134,17 +136,45 @@ class TriggerRect(Actor):
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
 
-
+####################################################################################################
 class MoonEnemy(Actor):
     def __init__(self, game, rect):
         super().__init__(game)
         self.r = rect
-        self.anim = get_anim_iterator([0,0,0,1,2,2,2,1,],7)
+        self.anim_updown = get_anim_iterator([0, 0, 0, 1, 2, 2, 2, 1, ], 7)
+        self.anim_eye = get_anim_iterator([0,1,0,2,3,0,1,1,0,2,4,0,1,0,2,2,0,1,1,0,2,5,3,3],120)
         self.sprite = Sprite("gameengine/assets/spritesheet_enemy2.png", 6)
 
+    def set_eye_direction(self):
+        pass
+
     def draw(self, surface, camera=None):
-        self.sprite.draw(surface, self.r.move(-camera.x,-camera.y+next(self.anim)))
+        self.sprite.frame_no = next(self.anim_eye)
+        self.sprite.draw(surface, self.r.move(-camera.x, -camera.y + next(self.anim_updown)))
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+####################################################################################################
+class MovingPlatform(Actor):
+    def __init__(self, game, rect):
+        super().__init__(game)
+        self.r = rect
+        self.sprite = Sprite("gameengine/assets/spritesheet_platform1.png", 2)
+        self.anim = get_anim_iterator([0,1],2)
+        self.moves = get_anim_iterator(144*[-1]+20*[0]+144*[1]+20*[0],1)
+        for x in range(random.randint(0,50)):
+            self.r.move_ip(next(self.moves),0)
 
+    def update(self):
+        dx = next(self.moves)
 
+        self.r.move_ip(dx,0)
+        for pe in self.game.get_actors_by_type("Player"): # TODO Verbesserung: Nicht nur Player berücks.
+            if not pe.r.colliderect(self.r) and pe.r.move(0, 1).colliderect(self.r):
+                pe.move2(dx, 0)
+
+    def draw(self, surface, camera=None):
+        self.sprite.frame_no = next(self.anim)
+        self.sprite.draw(surface, self.r.move(-camera.x, -camera.y))
+        if self.game.debug:
+            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+####################################################################################################

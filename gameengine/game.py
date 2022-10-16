@@ -1,11 +1,10 @@
 import pygame
 from .menu import *
 from .input import *
-from .tile import *
 from .prefab import *
 from .camera import Camera
 
-SCREENFACTOR = 4
+SCREENFACTOR = 1
 
 class Game:
     def __init__(self):
@@ -21,6 +20,8 @@ class Game:
         self.scaled_display = True
         self.screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
+
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
         self.__clock = pygame.time.Clock()
         self.update_times = 120*[0]
@@ -52,6 +53,8 @@ class Game:
                         self.menu = MainMenu(self)
                     else:
                         self.menu = None
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_F1:
+                    pass
             #########
             # TICK
             #########
@@ -92,16 +95,19 @@ class Game:
 
             if self.debug:
                 self.camera.draw(self.draw_surface)
+                # FPS
                 draw_text(self.draw_surface, f"FPS {self.__clock.get_fps():>3.1f}", 420, 3, "darkred")
+
+                # Debug Message
                 pygame.draw.rect(self.draw_surface, "black", (0,0,200,11), 0)
                 draw_text(self.draw_surface, self.debug_msg, 10, 1, "white")
 
+                # Times history
                 draw_frame_times(self.draw_surface, self.update_times)
 
-                #self.debug_msg = f"Anzahl Actors = {len(self.actors)}"
-
-
-            draw_text(self.draw_surface, f"Maus={self.camera.to_map_pos(pygame.mouse.get_pos())}", 10,20)
+                # Actors count
+                self.debug_msg = f"Anzahl Actors = {len(self.actors)}"
+                draw_text(self.draw_surface, f"Maus={self.camera.to_map_pos(pygame.mouse.get_pos())}", 10,20)
 
             if self.scaled_display:
                 self.screen.blit(self.draw_surface, (0, 0))
@@ -116,9 +122,14 @@ class Game:
             self.__clock.tick(60)
             time_before_update = pygame.time.get_ticks()
 
-
     def on_camera_changed(self):
         pass
+
+    def add_actor(self, a):
+        self.actors.append(a)
+
+    def get_actors_by_type(self, name: str):
+        return [a for a in self.actors if type(a).__name__ == name]
 
 
 

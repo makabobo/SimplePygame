@@ -1,7 +1,7 @@
 import pygame
 from .tile import Tile
-#from .animation import Animation
 from .util import *
+import gameengine
 from pygame import Vector2
 
 
@@ -29,7 +29,7 @@ class Sprite:
             self.__frames.append(self.texture)
         else:
             if self.texture.get_width() % framecount != 0:
-                print("Fehler bei Texture-Verarbeitung..")
+                print("Sprite: Fehler bei Texture-Verarbeitung..")
                 exit()
             self.width = self.texture.get_width() / framecount
             self.height = self.texture.get_height()
@@ -83,6 +83,12 @@ class PhysicsBody(Actor):
                 self.ys = 0.0
         return not blocked
 
+    def collided_top(self):
+        self.game.add_actor(gameengine.prefab.SimplePopup(self.game, self.r.midtop))
+
+    def collided_bottom(self):
+        self.game.add_actor(gameengine.prefab.SimplePopup(self.game, self.r.midbottom))
+
     def move2(self, xd, yd):
         if xd != 0 and yd != 0:
             raise Exception("Move2 kann pro Aufruf nur 1 Achse bewegen")
@@ -93,7 +99,7 @@ class PhysicsBody(Actor):
             collision_rects = []
             if self.game.map:
                 collision_rects = self.game.map.get_collision_tiles(tr, Tile.WALL)
-            #collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
+             #   collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
             for collider in collision_rects:
 
@@ -110,23 +116,28 @@ class PhysicsBody(Actor):
                 if yd > 0:
                     if tr.bottom > collider.top:
                         tr.bottom = collider.top
+                        self.collided_bottom()
                 # Kollision mit Decke?
                 if yd < 0:
                     if tr.top < collider.bottom:
                         tr.top = collider.bottom
+                        self.collided_top()
 
-
-            # Variante mit beweglichen Platformen
-            # if yd > 0:
-            #     for stair_tile in self.map.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
-            #         if tr.colliderect(stair_tile) and tr.bottom - yd-1 <= stair_tile.top:
-            #             tr.bottom = stair_tile.top
-
-            # Wenn Bewegung nach unten?
+            # Berücks. von Tile.STAIR und beweglichen Platformen
+            #
+            # Der Unterschied zu Tile.WALL ist, dass sich nur die oberste "Pixel-Zeile"
+            # als "Mauer" verhält.
             if yd > 0:
-                for stair_tile in self.game.map.get_collision_tiles(tr, Tile.STAIR):
+                for stair_tile in self.game.map.get_collision_tiles(tr, Tile.STAIR) + [mp.r for mp in self.game.get_actors_by_type("MovingPlatform")]:
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
+                        self.collided_bottom()
+
+            # Wenn Bewegung nach unten?
+            # if yd > 0:
+            #     for stair_tile in self.game.map.get_collision_tiles(tr, Tile.STAIR):
+            #         if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
+            #             tr.bottom = stair_tile.top
         self.r = tr
         return not blocked
 
@@ -154,7 +165,7 @@ class PhysicsBody(Actor):
         # "Bodenplatte des Players berechnen
         rg = self.r.move(0,1)
         collision_rects = self.game.map.get_collision_tiles(rg, Tile.WALL)
-        # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        #collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for cr in collision_rects:
             if test_rect_lying_on_rect(self.r, cr):
                 return True
@@ -164,7 +175,7 @@ class PhysicsBody(Actor):
         """ detects ground """
         rg = self.r.move(0,1)
         collision_rects = self.game.map.get_collision_tiles(rg, Tile.STAIR)
-        # collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
+        collision_rects += ([mp.r for mp in self.game.get_actors_by_type("MovingPlatform") if mp.r.colliderect(rg)])
         # collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for cr in collision_rects:
             if test_rect_lying_on_rect(self.r, cr):
@@ -180,6 +191,7 @@ class PhysicsBody(Actor):
 
         self.move_soft(int(self.xs), int(self.ys))
 
+
     def collides_with(self, other) -> bool:
         return self.r.colliderect(other.r)
 
@@ -187,3 +199,41 @@ class PhysicsBody(Actor):
         pass
 
 
+class Timer:
+
+    def __init__(self):
+        self.flist = []
+
+    class TimerStep:
+        def __init__(self, func, frames):
+            self.func = func
+            self.frames = frames
+
+    def add_step(self, func, frames=0):
+        if frames == 0:
+            frames = -1
+        self.flist.append(self.TimerStep(func, frames))
+
+    def wait(self):
+        pass
+
+    def update(self):
+
+        while self.flist:
+
+            # Nächster Eintrag mit -1 (Direkt-Ausführung mit 0 Ticks)
+            if self.flist[0].frames == -1:
+                self.flist[0].func()
+                del self.flist[0]
+                continue
+
+            # Nächster Eintrag vollständig ausgeführt?
+            if self.flist[0].frames == 0:
+                del self.flist[0]
+                continue
+
+            # Nächster Step mit frames >= 1
+            if self.flist[0].frames >= 1:
+                self.flist[0].func()
+                self.flist[0].frames -= 1
+                return

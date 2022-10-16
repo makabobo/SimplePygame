@@ -8,7 +8,7 @@
  "margin":0,
  "name":"tileset_enemies",
  "spacing":0,
- "tilecount":2,
+ "tilecount":3,
  "tiledversion":"1.8.4",
  "tileheight":48,
  "tiles":[
@@ -23,8 +23,14 @@
          "image":"sprite_enemy1.png",
          "imageheight":24,
          "imagewidth":24
+        }, 
+        {
+         "id":2,
+         "image":"platform1.png",
+         "imageheight":16,
+         "imagewidth":64
         }],
- "tilewidth":48,
+ "tilewidth":64,
  "type":"tileset",
  "version":"1.8"
 }
