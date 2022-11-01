@@ -16,10 +16,15 @@ class Game:
         self.debug_msg = ""
         self.camera = Camera(self)
         self.update_func = None
+        self.post_process = None
 
         self.scaled_display = True
         self.screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
+
+        pygame.mixer.init()
+#        sound_select1 = pygame.mixer.Sound(".gameengine/assets/sounds/sfx_3.wav")
+        #sound_select2 = pygame.mixer.Sound(".gameengine/assets/sounds/sfx_7.wav")
 
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
@@ -90,9 +95,13 @@ class Game:
             for a in self.actors:
                 a.draw(self.draw_surface, self.camera)
 
+            if self.post_process:
+                self.post_process.draw(self.draw_surface, self.camera)
+
             if self.menu:
                 self.menu.draw(self.draw_surface)
 
+            ################################################################################################
             if self.debug:
                 self.camera.draw(self.draw_surface)
                 # FPS
@@ -108,6 +117,7 @@ class Game:
                 # Actors count
                 self.debug_msg = f"Anzahl Actors = {len(self.actors)}"
                 draw_text(self.draw_surface, f"Maus={self.camera.to_map_pos(pygame.mouse.get_pos())}", 10,20)
+            ################################################################################################
 
             if self.scaled_display:
                 self.screen.blit(self.draw_surface, (0, 0))
@@ -130,6 +140,10 @@ class Game:
 
     def get_actors_by_type(self, name: str):
         return [a for a in self.actors if type(a).__name__ == name]
+
+    def remove_actor(self, a):
+        self.actors.remove(a)
+        pass
 
 
 

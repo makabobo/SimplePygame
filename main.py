@@ -43,13 +43,13 @@ while 1:
 
     # Draw ###########
     draw_surface.fill(map.backgroundcolor)
-    map.draw()
+    map.draw(,
     for _ in old_base.moving_platforms + moving_blocks + triggers:
-        _.draw()
+        _.draw(,
     if menu is None:
-        old_base.player.draw(delta)
+        old_base.player.draw(delta, )
     else:
-        old_base.player.draw(0)
+        old_base.player.draw(0, )
         menu.draw()
 
 

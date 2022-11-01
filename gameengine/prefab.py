@@ -1,7 +1,8 @@
-from .actor import *
-from .util import *
-import pygame
+from gameengine.actor import *
+from gameengine.util import *
+import gameengine.util as util
 from .tile import *
+from random import randint
 
 
 def draw_frame_times(surface, frame_times):
@@ -44,7 +45,7 @@ class SimplePopup(Actor):
 ####################################################################################################
 class Player(PhysicsBody):
     def __init__(self, game):
-        super().__init__(0, 0, 12, 34, game)
+        super().__init__(0, 0, 12, 31, game)
         self.playersprite = Sprite("gameengine/assets/player.png", 12)
 
         self.walk_anim = get_anim_iterator([0,1,2,1],4)
@@ -60,15 +61,22 @@ class Player(PhysicsBody):
 
         self.on_floor = self.check_on_floor()
         self.on_stair = self.check_on_stair()
+
+        self.killed_listener = None
     def set_pos(self, pos):
         self.r.midbottom = pos
+
+    def add_killed_listener(self, listener):
+        self.killed_listener = listener
 
     def check_status(self):
         self.on_floor = self.check_on_floor()
         self.on_stair = self.check_on_stair()
 
     def kill(self):
-        self.is_dead = True
+        self.dirty = True
+        if self.killed_listener:
+            self.killed_listener(self.game)
 
     def update(self):
         if self.is_dead:
@@ -153,6 +161,29 @@ class MoonEnemy(Actor):
         self.sprite.draw(surface, self.r.move(-camera.x, -camera.y + next(self.anim_updown)))
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+
+####################################################################################################
+class Diamond(Actor):
+
+    def __init__(self, game,rect):
+        super().__init__(game)
+        self.spr = Sprite("gameengine/assets/spritesheet_diamond.png", 1)
+        self.snd = pygame.mixer.Sound("gameengine/assets/sound/sfx_3.wav")
+        self.r = rect
+
+    def update(self):
+        if pls := self.game.get_actors_by_type("Player"):
+            p = pls[0]
+            if self.r.colliderect(p.r):
+                self.game.add_actor(SimplePopup(self.game, self.r.center))
+                self.snd.play()
+                self.dirty = True
+
+    def draw(self, surface, camera=None):
+        self.spr.draw(surface, self.r.move(-camera.x, -camera.y))
+        if self.game.debug:
+            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+
 ####################################################################################################
 class MovingPlatform(Actor):
     def __init__(self, game, rect):
@@ -178,3 +209,132 @@ class MovingPlatform(Actor):
         if self.game.debug:
             pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
 ####################################################################################################
+
+class WaterEffect(Actor):
+    def __init__(self, game):
+        super().__init__(game)
+        self.offset = 0
+        self.slower = util.get_anim_iterator([0,1],1)
+
+    def draw(self, surface, camera=None):
+        if next(self.slower):
+            self.offset += 1
+            self.offset %= 80
+        # Bad coding here, maybe too slow
+        anim = util.get_anim_iterator([0,1,2,2,1,0,-1,-2,-2,-1], 8)
+        for _ in range(self.offset):
+            next(anim)
+        for y in range(256):
+            surface.set_clip(pygame.Rect(0, y, 480, 1))
+            surface.scroll(next(anim),0)
+        surface.set_clip(None)
+        for _ in range(self.offset):
+            next(anim)
+        for x in range(0,480,1):
+            surface.set_clip(pygame.Rect(x, 0, 1, 256))
+            surface.scroll(0, next(anim))
+        surface.set_clip(None)
+
+####################################################################################################
+
+class DistortionEffect(Actor):
+    def __init__(self, game):
+        super().__init__(game)
+        self.dox = True
+        self.doy = True
+        self.step= 1
+        self.intense=3
+
+    def draw(self, surface, camera=None):
+        if self.doy:
+            for y in range(0, 256, self.step):
+                surface.set_clip(pygame.Rect(0, y, 480, self.step))
+                surface.scroll(randint(0,self.intense),0)
+        if self.dox:
+            for x in range(0, 480, self.step):
+                surface.set_clip(pygame.Rect(x, 0, self.step, 256))
+                surface.scroll(0,randint(0,self.intense))
+        surface.set_clip(None)
+
+####################################################################################################
+
+class GameOverSquence(Actor):
+
+    def __init__(self, g):
+        super().__init__(g)
+        self.y = 80
+        self.script = TimedCallbackList()
+        self.script.add_step(self.down, frames=30)
+        self.script.add_step(self.wait, frames=90)
+        self.script.add_step(self.up,  frames=30)
+        self.script.add_step(self.end, frames=0)
+
+        self.finished_listener = None
+
+    def add_finished_listener(self, listener):
+        self.finished_listener = listener
+
+    def wait(self):
+        pass
+
+    def up(self):
+        self.y -= 1
+    def down(self):
+        self.y += 1
+
+    def end(self):
+        if self.finished_listener:
+            self.finished_listener(self.game)
+        self.dirty = True
+
+    def update(self):
+        self.script.update()
+
+    def draw(self, surface, camera=None):
+        draw_text(surface, "YOU DIED, IDIOT", 200, self.y, "red")
+
+####################################################################################################
+
+class FlyingFragmentCreator(Actor):
+    def __init__(self, game):
+        super().__init__(game)
+        self.counter = 0
+
+    def update(self):
+        self.counter += 1
+        self.counter %= 132
+
+
+        if self.counter == 1:
+            for a in range(10):
+                self.game.add_actor(FlyingFragment(
+                    self.game,
+                    pos=Vector2(730,570),
+                    angle = Vector2(-1,0).rotate(randint(0,360)),
+                    speed = 130,
+                    color = pygame.Color("red")
+                ))
+
+    def draw(self, sf, cam=None):
+        if self.game.debug:
+            pygame.draw.circle(sf, "red", (730-cam.x,570-cam.y),radius=10, width=1)
+
+class FlyingFragment(Actor):
+    def __init__(self, game, pos: Vector2, angle: Vector2, speed: int, color: pygame.Color):
+        super().__init__(game)
+        self.pos = pos
+        self.vel = angle * speed
+        self.accel = Vector2(0,4.0)  # Gravity
+        self.color = color
+        self.maxlife = 200
+
+    def update(self):
+        self.maxlife -= 1
+        if self.maxlife <= 0:
+            self.dirty = True
+        delta = 1/60
+        self.vel += self.accel
+        self.pos += self.vel * delta
+
+    def draw(self, sf, cam=None):
+        pygame.draw.circle(sf, "#805050", (self.pos.x-cam.x,self.pos.y-cam.y),radius=3, width=0)

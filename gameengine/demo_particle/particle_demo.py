@@ -49,28 +49,6 @@ class ParticleSystem(Actor):
             draw.circle(sf, c, (p[X], p[Y]), 2, False)
 
 
-        self.dummy += 1
-        self.dummy %= 360
-
-        v1 = Vector2(100,100)
-        v2 = Vector2(200,200)
-        #v2.rotate_ip(self.dummy)
-        #v2 *= 20
-        #v2.normalize_ip()
-
-        a = v1.angle_to(v2)
-        draw_text(sf, f"angle:{a}",10,100)
-
-
-        draw.circle(sf, "blue", v1, 20,1)
-        draw.circle(sf, "green", v2, 20,1)
-
-
-
-
-
-
-
 a = ParticleSystem(game)
 game.actors.append(a)
 game.debug=True

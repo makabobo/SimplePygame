@@ -1,5 +1,5 @@
 { "columns":8,
- "image":"tileset_test.png",
+ "image":"..\/tileset_test.png",
  "imageheight":48,
  "imagewidth":128,
  "margin":0,

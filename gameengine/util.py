@@ -4,9 +4,9 @@ from pygame.font import *
 import random
 
 
-#font = Font("./gameengine/assets/m3x6.ttf", 15, bold=False, italic=False)
-#font = Font("./gameengine/assets/m5x7.ttf", 15, bold=False, italic=False)
-font = Font("./gameengine/assets/pixelmix.ttf", 8, bold=False, italic=False)
+#font = Font("./gameengine/assets/font/m3x6.ttf", 15, bold=False, italic=False)
+#font = Font("./gameengine/assets/font/m5x7.ttf", 15, bold=False, italic=False)
+font = Font("./gameengine/assets/font/pixelmix.ttf", 8, bold=False, italic=False)
 print_map = {}
 
 def draw_text(draw_surface, text, x, y, color="white"):
@@ -59,3 +59,39 @@ palettecolors = ["black", "darkblue", "darkred", "darkgreen",
                "brown", "darkgrey", "lightgrey", "white",
                "red", "orange", "yellow", "green",
                "blue", "grey", "pink", "lightpink"]
+
+class TimedCallbackList:
+
+    def __init__(self):
+        self.steps = []
+        self.cur_step = 0
+        self.cur_step_count = 0
+
+    class TimerStep:
+        def __init__(self, func, count):
+            self.func = func
+            self.count = count
+
+    def add_step(self, func, frames):
+        self.steps.append(self.TimerStep(func, frames))
+
+    def wait(self):
+        pass
+
+    def update(self):
+        if not self.steps:
+            return
+        while True:
+            ts = self.steps[self.cur_step]
+            ts.func()
+            self.cur_step_count += 1
+            if self.cur_step_count >= ts.count:
+                self.cur_step += 1
+                self.cur_step_count = 0
+                if self.cur_step >= len(self.steps):
+                    self.cur_step = 0
+                if ts.count > 0:
+                    return
+            else:
+                return
+

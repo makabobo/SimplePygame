@@ -25,6 +25,8 @@ class Sprite:
         self.__frames = []
         self.__frames_flipped = []
         self.texture = pygame.image.load(img_path)
+
+        self.texture.convert_alpha()
         if framecount <= 1:
             self.__frames.append(self.texture)
         else:
@@ -198,42 +200,3 @@ class PhysicsBody(Actor):
     def stands_on(self, other) -> bool:
         pass
 
-
-class Timer:
-
-    def __init__(self):
-        self.flist = []
-
-    class TimerStep:
-        def __init__(self, func, frames):
-            self.func = func
-            self.frames = frames
-
-    def add_step(self, func, frames=0):
-        if frames == 0:
-            frames = -1
-        self.flist.append(self.TimerStep(func, frames))
-
-    def wait(self):
-        pass
-
-    def update(self):
-
-        while self.flist:
-
-            # Nächster Eintrag mit -1 (Direkt-Ausführung mit 0 Ticks)
-            if self.flist[0].frames == -1:
-                self.flist[0].func()
-                del self.flist[0]
-                continue
-
-            # Nächster Eintrag vollständig ausgeführt?
-            if self.flist[0].frames == 0:
-                del self.flist[0]
-                continue
-
-            # Nächster Step mit frames >= 1
-            if self.flist[0].frames >= 1:
-                self.flist[0].func()
-                self.flist[0].frames -= 1
-                return

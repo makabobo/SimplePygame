@@ -2,56 +2,19 @@ from gameengine import *
 from gameengine.util import *
 from gameengine.actor import *
 
-game.load_map("gameengine/assets/test-map.tmj")
-class Timer:
+game.load_map("gameengine/assets/tilemap/test-map.tmj")
 
-    def __init__(self):
-        self.flist = []
-
-    class TimerStep:
-        def __init__(self, func, frames):
-            self.func = func
-            self.frames = frames
-
-    def add_step(self, func, frames=0):
-        if frames == 0:
-            frames = -1
-        self.flist.append(self.TimerStep(func, frames))
-
-    def wait(self):
-        pass
-
-    def update(self):
-
-        while self.flist:
-
-            # Nächster Eintrag mit -1 (Direkt-Ausführung mit 0 Ticks)
-            if self.flist[0].frames == -1:
-                self.flist[0].func()
-                del self.flist[0]
-                continue
-
-            # Nächster Eintrag vollständig ausgeführt?
-            if self.flist[0].frames == 0:
-                del self.flist[0]
-                continue
-
-            # Nächster Step mit frames >= 1
-            if self.flist[0].frames >= 1:
-                self.flist[0].func()
-                self.flist[0].frames -= 1
-                return
-
-class TimerNew:
+class TimedCallbackList:
 
     def __init__(self):
         self.steps = []
         self.cur_step = 0
+        self.cur_step_count = 0
 
     class TimerStep:
-        def __init__(self, func, frames):
+        def __init__(self, func, count):
             self.func = func
-            self.frames = frames
+            self.count = count
 
     def add_step(self, func, frames):
         self.steps.append(self.TimerStep(func, frames))
@@ -62,20 +25,29 @@ class TimerNew:
     def update(self):
         if not self.steps:
             return
-
-
-
+        while True:
+            ts = self.steps[self.cur_step]
+            ts.func()
+            self.cur_step_count += 1
+            if self.cur_step_count >= ts.count:
+                self.cur_step += 1
+                self.cur_step_count = 0
+                if self.cur_step >= len(self.steps):
+                    self.cur_step = 0
+                if ts.count > 0:
+                    return
+            else:
+                return
 
 class ShortMessageTop(Actor):
 
-    def __init__(self, g, msg):
+    def __init__(self, g):
         super().__init__(g)
-        self.msg = msg
-        self.y = -10
-        self.script = Timer()
-        self.script.add_step(self.down, frames=60)
+        self.y = 70
+        self.script = TimedCallbackList()
+        self.script.add_step(self.down, frames=30)
         self.script.add_step(self.wait, frames=30)
-        self.script.add_step(self.up,  frames=60)
+        self.script.add_step(self.up,  frames=30)
         self.script.add_step(self.end, frames=0)
 
     def wait(self):
@@ -88,16 +60,15 @@ class ShortMessageTop(Actor):
         self.y += 1
 
     def end(self):
-        print("Dirty...")
         self.dirty = True
 
     def update(self):
         self.script.update()
 
     def draw(self, surface, camera=None):
-        draw_text(surface, self.msg, 220, self.y, "red")
+        draw_text(surface, "YOU DIED", 220, self.y, "red")
 
-p = ShortMessageTop(game, "10 Punkte")
+p = ShortMessageTop(game)
 game.actors.append(p)
 game.start()
 

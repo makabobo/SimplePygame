@@ -225,6 +225,7 @@ class Tilemap:
             if layer["type"] == "tilelayer":
                 if self.mapdata:
                     # Can read only one tilelayer yet..
+                    logging.warning(f"Tilelayer nicht gelesen: {repr(layer['type'])}")
                     continue
                 map_temp = layer["data"]
                 self.mapdata = []
@@ -246,7 +247,8 @@ class Tilemap:
                 logging.info(f"New Object-Layer '{ol.name}'")
                 for o in layer["objects"]:
                     if "point" in o.keys():
-                        ol.append(TilemapLayerObject("Point", pygame.Rect(o["x"], o["y"], 0, 0), o["type"], o["name"], o["id"]))
+                        ol.append(TilemapLayerObject("Point", pygame.Rect(o["x"], o["y"], 0, 0), o["class"], o["name"], o["id"]))
+                        logging.info(repr(o))
 
                     elif "ellipse" in o.keys():
                         logging.info("Ellipse überlesen...")
@@ -259,10 +261,9 @@ class Tilemap:
                         logging.info("Text überlesen")
                         continue
                     else:
-                        ol.append(TilemapLayerObject("Rect", pygame.Rect(o["x"], o["y"], o["width"], o["height"]), o["type"], o["name"], o["id"]))
+                        ol.append(TilemapLayerObject("Rect", pygame.Rect(o["x"], o["y"], o["width"], o["height"]), o["class"], o["name"], o["id"]))
+                        logging.info(repr(o))
                         #logging.info("Polygon überlesen...")
-
-
 
         logging.info(f"Tilemap.load: Tilemap width={self.width} height={self.height}")
         logging.info(f"Tilemap.load: Tilemap {filepath} loaded successfully.")
@@ -340,12 +341,3 @@ class Tilemap:
                         surface.blit(tile.surface, (int(draw_pos_x), int(draw_pos_y)))
                 if self.game.debug:
                     pygame.draw.line(surface, "green", (draw_pos_x, draw_pos_y), (draw_pos_x, draw_pos_y))
-
-        # if self.game.debug:
-        #     for _ in self.object_layers:
-        #         if _.type == "Rect":
-        #             pygame.draw.rect(surface, "red", _.r.move(-camera.x,-camera.y), 1)
-        #             draw_text(surface,f"{_.name} : {_.type} : {_.subtype}",_.r.x-camera.x, _.r.y-camera.y-10)
-        #         if _.type == "Point":
-        #             pygame.draw.rect(surface, "blue", _.r.move(-camera.x,-camera.y), 1)
-        #             draw_text(surface,f"{_.name} : {_.type} : {_.subtype}",_.r.x - camera.x, _.r.y - camera.y - 10)

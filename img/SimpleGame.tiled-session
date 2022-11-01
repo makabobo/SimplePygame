@@ -1,14 +1,37 @@
 {
-    "Map/SizeTest": {
-        "height": 4300,
-        "width": 2
-    },
-    "activeFile": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
+    "activeFile": "C:/Users/mka/Desktop/src_noiboy/data/levels/l2.tmx",
     "expandedProjectPaths": [
-        "."
     ],
     "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/forest.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l1.tmx": {
+            "scale": 1.8376562499999998,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 467.9874160360514,
+                "y": 128.69653940991412
+            }
+        },
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l2.tmx": {
+            "scale": 1.7367187499999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.2159244264507,
+                "y": 128.11515969410706
+            }
+        },
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/level1.tmx": {
+            "scale": 4,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 479.75,
+                "y": 239.875
+            }
+        },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
@@ -37,19 +60,37 @@
             "scaleInEditor": 8
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj": {
-            "scale": 0.75,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 152.66666666666663,
-                "y": 547.3333333333333
+                "x": 422.5,
+                "y": 447.5
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj": {
-            "scale": 4,
+            "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 549.875,
-                "y": 761.375
+                "x": 443.25,
+                "y": 220.25
+            }
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Test-Tileset.tsj": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Tileset-Enemies.tsj": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/test-map.tmj": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1104,
+                "y": 1526
             }
         },
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj": {
@@ -94,44 +135,35 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1660.3333333333333,
-                "y": 1598.3333333333333
+                "x": 378.99999999999994,
+                "y": 586.3333333333333
             }
         }
     },
-    "frame.defaultDuration": 200,
     "last.imagePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets",
-    "last.objectTemplatePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/img",
-    "map.height": 200,
-    "map.lastUsedFormat": "json",
-    "map.tileHeight": 16,
-    "map.tileWidth": 16,
-    "map.width": 200,
+    "last.objectTemplatePath": "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap",
+    "mapScene.enableWorlds": true,
     "openFiles": [
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj"
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/test-map.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Tileset-Enemies.tsj",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/level1.tmx",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l1.tmx",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l2.tmx"
     ],
-    "project": "SimpleGame.tiled-project",
-    "property.type": "int",
+    "project": "",
     "recentFiles": [
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Tileset-Enemies.tsj",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/level1.tmx",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l1.tmx",
+        "C:/Users/mka/Desktop/src_noiboy/data/levels/l2.tmx",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/test-map.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tilemap/Test-Tileset.tsj",
         "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/test-map.tmj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/tileset_crater1.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/TheGame/level/Level 1-1.json",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset.tsj",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/test-map.tmj",
-        "Test-Tileset.json",
         "test_map.json",
-        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/Test-Tileset2.tsj"
-    ],
-    "tileset.lastUsedFormat": "json",
-    "tileset.tileSize": {
-        "height": 48,
-        "width": 48
-    },
-    "tileset.type": 1
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Test-Tileset.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Tileset-Enemies.tsj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/map_crater1.tmj",
+        "C:/Users/mka/Documents/Privat/Software & Daten/Software-Entwicklung/Python/SimplePygame/gameengine/assets/Enemy2.tsj"
+    ]
 }
