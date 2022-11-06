@@ -6,32 +6,32 @@
  "name":"Test-Tileset",
  "spacing":0,
  "tilecount":24,
- "tiledversion":"1.8.4",
+ "tiledversion":"1.9.2",
  "tileheight":16,
  "tiles":[
         {
-         "id":2,
-         "type":"WALL"
+         "class":"WALL",
+         "id":2
         }, 
         {
-         "id":3,
-         "type":"WALL"
+         "class":"WALL",
+         "id":3
         }, 
         {
-         "id":9,
-         "type":"WALL"
+         "class":"WALL",
+         "id":9
         }, 
         {
-         "id":10,
-         "type":"WALL"
+         "class":"WALL",
+         "id":10
         }, 
         {
-         "id":11,
-         "type":"WALL"
+         "class":"WALL",
+         "id":11
         }, 
         {
-         "id":15,
-         "type":"STAIR"
+         "class":"STAIR",
+         "id":15
         }, 
         {
          "animation":[
@@ -55,5 +55,5 @@
         }],
  "tilewidth":16,
  "type":"tileset",
- "version":"1.8"
+ "version":"1.9"
 }

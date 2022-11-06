@@ -86,10 +86,10 @@ class PhysicsBody(Actor):
         return not blocked
 
     def collided_top(self):
-        self.game.add_actor(gameengine.prefab.SimplePopup(self.game, self.r.midtop))
+        pass
 
     def collided_bottom(self):
-        self.game.add_actor(gameengine.prefab.SimplePopup(self.game, self.r.midbottom))
+        pass
 
     def move2(self, xd, yd):
         if xd != 0 and yd != 0:
@@ -100,7 +100,7 @@ class PhysicsBody(Actor):
 
             collision_rects = []
             if self.game.map:
-                collision_rects = self.game.map.get_collision_tiles(tr, Tile.WALL)
+                collision_rects = self.game.map.get_collision_tiles_at_rect(tr, Tile.WALL)
              #   collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
             for collider in collision_rects:
@@ -130,7 +130,7 @@ class PhysicsBody(Actor):
             # Der Unterschied zu Tile.WALL ist, dass sich nur die oberste "Pixel-Zeile"
             # als "Mauer" verhält.
             if yd > 0:
-                for stair_tile in self.game.map.get_collision_tiles(tr, Tile.STAIR) + [mp.r for mp in self.game.get_actors_by_type("MovingPlatform")]:
+                for stair_tile in self.game.map.get_collision_tiles_at_rect(tr, Tile.STAIR) + [mp.r for mp in self.game.get_actors_by_type("MovingPlatform")]:
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
                         self.collided_bottom()
@@ -166,7 +166,7 @@ class PhysicsBody(Actor):
         """ detects ground """
         # "Bodenplatte des Players berechnen
         rg = self.r.move(0,1)
-        collision_rects = self.game.map.get_collision_tiles(rg, Tile.WALL)
+        collision_rects = self.game.map.get_collision_tiles_at_rect(rg, Tile.WALL)
         #collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for cr in collision_rects:
             if test_rect_lying_on_rect(self.r, cr):
@@ -176,7 +176,7 @@ class PhysicsBody(Actor):
     def check_on_stair(self):
         """ detects ground """
         rg = self.r.move(0,1)
-        collision_rects = self.game.map.get_collision_tiles(rg, Tile.STAIR)
+        collision_rects = self.game.map.get_collision_tiles_at_rect(rg, Tile.STAIR)
         collision_rects += ([mp.r for mp in self.game.get_actors_by_type("MovingPlatform") if mp.r.colliderect(rg)])
         # collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for cr in collision_rects:

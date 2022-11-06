@@ -65,11 +65,10 @@ def on_gameover_finish(game):
 
 
 
-#game.post_process = DistortionEffect(game)
+#game.post_process = WaterEffect(game)
+#game.post_process = ElectricityEffect(game)
 
 insert_new_player(game)
-
-game.add_actor(FlyingFragmentCreator(game))
 
 game.update_func = update
 game.start()

@@ -11,6 +11,11 @@ class Menu(Actor):
         self.pos = 0
         self.items = []
         self.selection_bar = Sprite("./gameengine/assets/menu_selection_bar1.png")
+        self.background = pygame.image.load("gameengine/assets/img_tests/test_bg2.png")
+        self.background = self.background.convert_alpha()
+        #self.background.set_alpha(240)
+        self.bgoffset = 0.0
+
 
         # Animator for the Selection-Bar (Fade in/out)
         self.fader = get_anim_iterator([30,80,130,180,230,255,230,180,130,80],6)
@@ -43,23 +48,31 @@ class Menu(Actor):
 
         self.selection_bar.alpha = next(self.fader)
 
-        pygame.draw.rect(surface, "black",    pygame.Rect(140, 80, 200, 130), 0)
-        pygame.draw.rect(surface, "brown", pygame.Rect(140, 80, 200, 130), 2)
+        #pygame.draw.rect(surface, "black",    pygame.Rect(140, 80, 200, 130), 0)
+        pygame.gfxdraw.textured_polygon(surface,
+                                        [(140, 80), (339, 80), (339, 209), (140, 209)],
+                                        self.background,
+                                        int(self.bgoffset),
+                                        int(-self.bgoffset))
+        self.bgoffset += 0.30
+        self.bgoffset %= 32
+
+        pygame.draw.rect(surface, "blue", pygame.Rect(140, 80, 200, 130), 2)
 
         draw_text(surface, self.name, x + 44, 80 + 5, "darkgray")
 
         num = 0
         for item in self.items:
             if num == self.pos:
-                self.selection_bar.draw(surface, (142, y-3))
+                #self.selection_bar.draw(surface, (142, y-3))
                 # Ausgewählter Menüpunkt
                 draw_text(surface, ">", x-10 +next(self.arrow_animator), y, "white")
                 draw_text(surface, item[0], x + 10, y, "white")
                 draw_text(surface, item[1], x + 140, y, "white")
             else:
                 # Nicht ausgewählte Menüpunkte
-                draw_text(surface, item[0], x + 10, y, "lightgray")
-                draw_text(surface, item[1], x + 140, y, "lightgray")
+                draw_text(surface, item[0], x + 10, y, "#444444")
+                draw_text(surface, item[1], x + 140, y, "#444444")
             y += yd
             num += 1
 

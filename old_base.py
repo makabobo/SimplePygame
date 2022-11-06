@@ -519,7 +519,7 @@ class Tilemap:
         if tid == 0:
             return None
         for ts in self.tilesets:
-            if tile := ts.get(tid):
+            if tile := ts.point_to_cellxy(tid):
                 return tile
         logging.error(f"TileId {tid} from map not found..")
         sys.exit()
@@ -679,7 +679,7 @@ class SpriteActor(Actor):
 
             collision_rects = []
             if self.tilemap:
-                collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
+                collision_rects = self.tilemap.get_collision_tiles_at_rect(tr, Tile.WALL)
             collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
 
             for collider in collision_rects:
@@ -702,7 +702,7 @@ class SpriteActor(Actor):
                     if tr.top < collider.bottom:
                         tr.top = collider.bottom
             if yd > 0:
-                for stair_tile in self.tilemap.get_collision_tiles(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
+                for stair_tile in self.tilemap.get_collision_tiles_at_rect(tr, Tile.STAIR) + [x.r for x in moving_platforms]:
                     # wenn mit treppe kollidiert und im letzten Frame vollständig oberhalb des Tiles war
                     if tr.colliderect(stair_tile) and tr.bottom - yd <= stair_tile.top:
                         tr.bottom = stair_tile.top
@@ -725,7 +725,7 @@ class SpriteActor(Actor):
     def on_floor(self):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        collision_rects = self.tilemap.get_collision_tiles(tr, Tile.WALL)
+        collision_rects = self.tilemap.get_collision_tiles_at_rect(tr, Tile.WALL)
         collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         for tile_rect in collision_rects:
             tile_rect.h = 1
@@ -736,7 +736,7 @@ class SpriteActor(Actor):
     def on_stair(self):
         """ detects ground """
         tr = pygame.Rect(self.r.x, self.r.y + self.r.h, self.r.w, 1)
-        collision_rects = self.tilemap.get_collision_tiles(tr, Tile.STAIR)
+        collision_rects = self.tilemap.get_collision_tiles_at_rect(tr, Tile.STAIR)
         collision_rects += ([w.r for w in moving_platforms if w.r.colliderect(tr)])
         collision_rects += ([w.r for w in moving_blocks if w.r.colliderect(tr)])
         for tile_rect in collision_rects:

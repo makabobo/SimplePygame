@@ -3,6 +3,7 @@ from .menu import *
 from .input import *
 from .prefab import *
 from .camera import Camera
+from .playstats import PlayStat
 
 SCREENFACTOR = 1
 
@@ -15,12 +16,17 @@ class Game:
         self.debug = False
         self.debug_msg = ""
         self.camera = Camera(self)
+        self.playstat = PlayStat(self)
         self.update_func = None
         self.post_process = None
 
         self.scaled_display = True
         self.screen = pygame.display.set_mode((480, 256), pygame.SCALED | pygame.RESIZABLE, vsync=1)
         self.draw_surface = pygame.Surface((480, 256))
+
+        self.bg = pygame.image.load("gameengine/assets/img_tests/test_bg.png")
+        self.bg = self.bg.convert_alpha()
+
 
         pygame.mixer.init()
 #        sound_select1 = pygame.mixer.Sound(".gameengine/assets/sounds/sfx_3.wav")
@@ -61,7 +67,7 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_F1:
                     pass
             #########
-            # TICK
+            # UPDATE
             #########
 
             # Controller muss als erstes tick() erhalten
@@ -84,10 +90,17 @@ class Game:
                 if self.update_func:
                     self.update_func()
 
+                self.playstat.update()
+
             #########
             # DRAW
             #########
-            self.draw_surface.fill("black")
+            #self.draw_surface.fill("black")
+            pygame.gfxdraw.textured_polygon(self.draw_surface,
+                                            [(0,0),(480,0),(480,256),(0,256)],
+                                            self.bg,
+                                            int(-self.camera.x*0.4),
+                                            0)
 
             if self.map:
                 self.map.draw(self.draw_surface, self.camera)
@@ -97,6 +110,8 @@ class Game:
 
             if self.post_process:
                 self.post_process.draw(self.draw_surface, self.camera)
+
+            self.playstat.draw(self.draw_surface, self.camera)
 
             if self.menu:
                 self.menu.draw(self.draw_surface)

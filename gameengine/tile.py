@@ -6,7 +6,7 @@ import math
 import sys
 
 logging.getLogger().setLevel("INFO")
-from .util import draw_text
+from gameengine.util import Pos
 
 ##################################################################
 # Tiles
@@ -61,7 +61,10 @@ class Tileset:
             'firstgid' wird bei mehreren Tilesets in einer Map enthalten sind.
         """
         logging.info(f"Tileset.load: Aufruf Tileset.load('{path}', first_gid={first_gid})")
-        tileset_json = json.load(open(path))
+        try:
+            tileset_json = json.load(open(path))
+        except:
+            logging.error(f"Tileset.load: Fehler. Tileset '{path}' nicht gefunden oder falsches Format (xml statt json?)?")
 
         # Handelt es sich um ein Tileset mit Sprites statt Tiles?
         if "image" not in tileset_json.keys():
@@ -93,7 +96,7 @@ class Tileset:
             for col in range(columns):
                 # ID berechnen
                 tile_id = row * columns + col
-                rect = pygame.Rect(self.tilewidth * col, self.tileheight * row, 16, 16)
+                rect = pygame.Rect(self.tilewidth * col, self.tileheight * row, self.tilewidth, self.tileheight)
                 sf = pygame.Surface((self.tilewidth, self.tileheight), pygame.SRCALPHA)
                 sf.blit(self.img, (0, 0), rect)
 
@@ -111,8 +114,8 @@ class Tileset:
 
                 # Tiles mit Type-Flags
                 flags = ""
-                if js_tile and "type" in js_tile.keys():
-                    flags = js_tile["type"].lower()
+                if js_tile and "class" in js_tile.keys():
+                    flags = js_tile["class"].lower()
 
                 t = Tile(sf, tile_id + first_gid, flags)
                 self.tiles.append(t)
@@ -123,8 +126,8 @@ class Tileset:
             tile_id = js_tile["id"]
             # Flags berücksichtigen
             flags = ""
-            if js_tile and "type" in js_tile.keys():
-                flags = js_tile["type"].lower()
+            if js_tile and ("class" in js_tile.keys()):
+                flags = js_tile["class"].lower()
             frame_ids = []
             # print(js_tile.keys())
             for frame in js_tile["animation"]:
@@ -170,8 +173,6 @@ class TilemapLayerObject:
         self.subtype = subtype
         self.id = id
         self.name = name
-
-
 
 class Tilemap:
     def __init__(self, game):
@@ -276,26 +277,44 @@ class Tilemap:
             # Liefere alle Objekte des Layers zurück
             return self.object_layers[layer].objects
 
-    def get(self, celx, cely):
-        return int(math.floor(celx / self.tilewidth)), int(math.floor(cely / self.tileheight))
+    def point_to_cellxy(self, x, y):
+        return int(math.floor(x / self.tilewidth)), int(math.floor(y / self.tileheight))
 
-    def __get_tile_rect(self, celx, cely):
+    def get_at(self, x, y):
+        if ( x < 0 or x >= self.width) or (y < 0 or y >= self.height):
+            return None
+        else:
+            return self.mapdata[y][x]
+
+    def get_at_point(self, x, y):
+        tx, ty = self.point_to_cellxy(x, y)
+        return self.get_at(tx, ty)
+
+    def get_tile_rect(self, celx, cely):
         return pygame.rect.Rect(celx * self.tilewidth, cely * self.tileheight, self.tilewidth, self.tileheight)
 
-    def get_collision_tiles(self, rect, flags=Tile.ALL_FLAGS) -> list[pygame.Rect]:
+    def get_collision_tiles_at_rect(self, rect: pygame.Rect, flags=Tile.ALL_FLAGS) -> list[pygame.Rect]:
         """"Liefert zu einem Rechteck eine Liste aller kollidierenden Rects zurück mit gegebenen Flags"""
 
         collision_tiles = []
-        topleft = self.get(rect.topleft[0], rect.topleft[1])
-        bottomright = self.get(rect.x + rect.w - 1, rect.y + rect.h - 1)
+        topleft = self.point_to_cellxy(rect.topleft[0], rect.topleft[1])
+        bottomright = self.point_to_cellxy(rect.x + rect.w - 1, rect.y + rect.h - 1)
 
         for y in range(topleft[1], bottomright[1] + 1):
             for x in range(topleft[0], bottomright[0] + 1):
                 tile = self.mapdata[y][x]
                 if tile and tile.has_flags(flags):  # not empty Room
-                    collision_tiles.append(self.__get_tile_rect(x, y))
+                    collision_tiles.append(self.get_tile_rect(x, y))
         self.last_collision_rects = collision_tiles
         return collision_tiles
+
+    def get_collision_tile_at_point(self, pos: Pos, flags=Tile.ALL_FLAGS):
+        x, y = self.point_to_cellxy(pos.x, pos.y)
+        tile = self.get_at(x,y)
+        if tile and tile.has_flags(flags):
+            return self.get_tile_rect(x, y)
+        else:
+            return None
 
     def get_tile_from_id(self, tid: int):
         if tid == 0:
@@ -307,8 +326,8 @@ class Tilemap:
         sys.exit()
 
     def update(self):
-        for _ in self.tilesets:
-            _.update()
+        for t in self.tilesets:
+            t.update()
 
     def draw(self, surface, camera):
         first_tile_x = math.floor(camera.x / self.tilewidth)

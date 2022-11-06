@@ -1,8 +1,11 @@
+import pygame.gfxdraw
+
 from gameengine.actor import *
 from gameengine.util import *
 import gameengine.util as util
 from .tile import *
 from random import randint
+
 
 
 def draw_frame_times(surface, frame_times):
@@ -75,8 +78,18 @@ class Player(PhysicsBody):
 
     def kill(self):
         self.dirty = True
+
+        x,y = self.r.center
+        create_player_explosion(self.game, x, y)
         if self.killed_listener:
             self.killed_listener(self.game)
+    def collided_top(self):
+        x, y = self.r.midtop
+        create_fragments(self.game, x, y)
+
+    def collided_bottom(self):
+        pass
+        #self.game.add_actor(gameengine.prefab.SimplePopup(self.game, self.r.midbottom))
 
     def update(self):
         if self.is_dead:
@@ -92,7 +105,7 @@ class Player(PhysicsBody):
         # Springen von Boden oder Treppe
         if self.game.controller.a == 1 and not self.game.controller.down and (self.on_stair or self.on_floor):
             self.ys = -6.7
-            self.game.add_actor(SimplePopup(self.game, self.r.midbottom))
+            #self.game.add_actor(SimplePopup(self.game, self.r.midbottom))
 
         # Von Treppe fallen lassen
         if self.game.controller.a == 1 and self.game.controller.down and self.on_stair:
@@ -146,6 +159,9 @@ class TriggerRect(Actor):
 
 ####################################################################################################
 class MoonEnemy(Actor):
+    MAX_SPEED = 2.0
+    AWARE_RADIUS=150
+
     def __init__(self, game, rect):
         super().__init__(game)
         self.r = rect
@@ -153,14 +169,51 @@ class MoonEnemy(Actor):
         self.anim_eye = get_anim_iterator([0,1,0,2,3,0,1,1,0,2,4,0,1,0,2,2,0,1,1,0,2,5,3,3],120)
         self.sprite = Sprite("gameengine/assets/spritesheet_enemy2.png", 6)
 
-    def set_eye_direction(self):
-        pass
+        self.pos = Vector2(rect.centerx, rect.centery)
+        self.pos_start = self.pos.copy()
+        self.v   = Vector2(0,0)
+
+
+    def update(self):
+        self.pos += self.v
+        self.r.center = self.pos
+
+        if pls := self.game.get_actors_by_type("Player"):
+            p = pls[0] # Only 1 Player can exist
+            v = Vector2(self.r.center)
+            vp = Vector2(p.r.center)
+
+            # Distance to Player
+            d = (vp - v).length()
+            # Am I near to the Player (100px)?
+            if d < self.AWARE_RADIUS:
+                direction = vp-v
+                if direction.length() > 0.0:
+                    direction.normalize_ip()
+                    self.v = self.v+(direction*0.06)
+            else:
+                # brake if player far away
+                self.v *= 0.97
+            if d < 20:
+                p.kill()
+                self.pos = self.pos_start.copy()
+                self.v.scale_to_length(0.0)
+        else:
+            # brake if player not existent
+            self.v *= 0.99
+        # Speed limit
+        if self.v.length() > MoonEnemy.MAX_SPEED:
+            self.v.scale_to_length(MoonEnemy.MAX_SPEED)
+
 
     def draw(self, surface, camera=None):
         self.sprite.frame_no = next(self.anim_eye)
         self.sprite.draw(surface, self.r.move(-camera.x, -camera.y + next(self.anim_updown)))
         if self.game.debug:
-            pygame.draw.rect(surface, "red", self.r.move(-camera.x, -camera.y), 1)
+            draw_text(surface, f"v={self.v.length():3.3f}",self.pos.x-camera.x-20, self.pos.y-camera.y+25, "red")
+            center = self.r.move(-camera.x,-camera.y).center
+            #pygame.draw.circle(surface, "yellow", center,self.AWARE_RADIUS, 1)
+            pygame.gfxdraw.filled_circle(surface, center[0], center[1], self.AWARE_RADIUS, (255,0,255,40))
 
 ####################################################################################################
 class Diamond(Actor):
@@ -173,10 +226,10 @@ class Diamond(Actor):
 
     def update(self):
         if pls := self.game.get_actors_by_type("Player"):
-            p = pls[0]
+            p = pls[0] # Only 1 Player can exist
             if self.r.colliderect(p.r):
                 self.game.add_actor(SimplePopup(self.game, self.r.center))
-                self.snd.play()
+                #self.snd.play()
                 self.dirty = True
 
     def draw(self, surface, camera=None):
@@ -215,8 +268,10 @@ class WaterEffect(Actor):
         super().__init__(game)
         self.offset = 0
         self.slower = util.get_anim_iterator([0,1],1)
+        self.sf_old = pygame.surface.Surface((480,256))
 
     def draw(self, surface, camera=None):
+        #self.sf_old = surface
         if next(self.slower):
             self.offset += 1
             self.offset %= 80
@@ -234,10 +289,15 @@ class WaterEffect(Actor):
             surface.set_clip(pygame.Rect(x, 0, 1, 256))
             surface.scroll(0, next(anim))
         surface.set_clip(None)
+        temp = surface.copy()
+        self.sf_old.set_alpha(50)
+        surface.blit(self.sf_old, (1,1))
+        surface.blit(self.sf_old, (-1,-1))
+        self.sf_old = temp
 
 ####################################################################################################
 
-class DistortionEffect(Actor):
+class ElectricityEffect(Actor):
     def __init__(self, game):
         super().__init__(game)
         self.dox = True
@@ -264,9 +324,9 @@ class GameOverSquence(Actor):
         super().__init__(g)
         self.y = 80
         self.script = TimedCallbackList()
-        self.script.add_step(self.down, frames=30)
-        self.script.add_step(self.wait, frames=90)
-        self.script.add_step(self.up,  frames=30)
+        self.script.add_step(self.down, frames=10)
+        self.script.add_step(self.wait, frames=280)
+        self.script.add_step(self.up,  frames=10)
         self.script.add_step(self.end, frames=0)
 
         self.finished_listener = None
@@ -295,46 +355,91 @@ class GameOverSquence(Actor):
 
 ####################################################################################################
 
-class FlyingFragmentCreator(Actor):
-    def __init__(self, game):
-        super().__init__(game)
-        self.counter = 0
+def create_fragments(game, x: int, y: int):
+    for a in range(randint(1,3)):
+        game.add_actor(PhysicsParticle(
+            game,
+            pos=Vector2(x, y),
+            angle=Vector2(0, 1).rotate(randint(-90, 90)),
+            speed=randint(0, 50),
+            color=pygame.Color("gray"),
+            size = 1,
+            maxlife= 100
 
-    def update(self):
-        self.counter += 1
-        self.counter %= 132
+        ))
+
+def create_player_explosion(game, x: int, y: int):
+    for a in range(120):
+        game.add_actor(PhysicsParticle(
+            game,
+            pos=Vector2(x, y),
+            angle=Vector2(0, -1).rotate(randint(-30,30)),
+            speed=randint(35, 380),
+            color=pygame.Color("white"),
+            size=3,
+            maxlife=250 + randint(0, 50)
+        ))
 
 
-        if self.counter == 1:
-            for a in range(10):
-                self.game.add_actor(FlyingFragment(
-                    self.game,
-                    pos=Vector2(730,570),
-                    angle = Vector2(-1,0).rotate(randint(0,360)),
-                    speed = 130,
-                    color = pygame.Color("red")
-                ))
+class PhysicsParticle(Actor):
+    """
+    A Physics Particle has a collision point instead of a rect and
+    is used for Shrapnells, Dirt, Bubbles etc.
+    Collision is used for WALL-Tiles, Stairs etc.
+    """
+    DELTA = 1 / 60
 
-    def draw(self, sf, cam=None):
-        if self.game.debug:
-            pygame.draw.circle(sf, "red", (730-cam.x,570-cam.y),radius=10, width=1)
-
-class FlyingFragment(Actor):
-    def __init__(self, game, pos: Vector2, angle: Vector2, speed: int, color: pygame.Color):
+    def __init__(self, game, pos: Vector2, angle: Vector2, speed: float, color: pygame.Color, size: int, maxlife:int):
         super().__init__(game)
         self.pos = pos
         self.vel = angle * speed
-        self.accel = Vector2(0,4.0)  # Gravity
+        self.acc = Vector2(0, 5.50)  # Gravity
         self.color = color
-        self.maxlife = 200
+        self.size = size
+        self.maxlife = maxlife
 
     def update(self):
         self.maxlife -= 1
         if self.maxlife <= 0:
             self.dirty = True
-        delta = 1/60
-        self.vel += self.accel
-        self.pos += self.vel * delta
+        self.vel += self.acc
+        self.move(self.vel * self.DELTA)
+
+    def move(self, vec: Vector2):
+        self.move2(vec.x, 0)
+        self.move2(0, vec.y)
+
+    def move2(self, x, y):
+        assert(not(x and y), "move2 only x or y set")
+        if x != 0.0 or y != 0.0:
+            # new pos
+            npos = self.pos+Vector2(x,y)
+            # cr Collision-Rect
+            cr = self.game.map.get_collision_tile_at_point(npos,Tile.WALL)
+            if cr:
+                if x > 0:
+                    npos.x = cr.left-1
+                    self.vel.x = -self.vel.x*0.3
+                elif x < 0:
+                    npos.x = cr.right+1
+                    self.vel.x = -self.vel.x*0.3
+                elif y > 0:
+                    npos.y = cr.top-0.5 # -0.5 so that pixels don't start swinging
+                    self.vel.y = -self.vel.y*0.4
+                    self.vel.x *= 0.6 # Reibung
+                elif y < 0:
+                    npos.y = cr.bottom+1
+                    self.vel.y = -self.vel.y
+            self.pos = npos
 
     def draw(self, sf, cam=None):
-        pygame.draw.circle(sf, "#805050", (self.pos.x-cam.x,self.pos.y-cam.y),radius=3, width=0)
+        pos = self.pos.x-cam.x, self.pos.y-cam.y
+        pygame.gfxdraw.filled_circle(sf, int(pos[0]),int(pos[1]), self.size+1,(255,255,255,20))
+        pygame.gfxdraw.filled_circle(sf, int(pos[0]),int(pos[1]), self.size+3,(255,255,255,10))
+        pygame.gfxdraw.filled_circle(sf, int(pos[0]),int(pos[1]), self.size+6,(255,255,255,10))
+        if self.size == 1:
+            pygame.draw.line(sf, self.color, pos, pos, 1)
+        else:
+            pygame.draw.circle(sf, self.color, pos, radius=self.size-1, width=0)
+
+
